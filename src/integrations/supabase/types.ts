@@ -106,7 +106,7 @@ export type Database = {
           id: string
           name: string
           sport: Database["public"]["Enums"]["sport_type"]
-          team: string
+          teams: string[]
           updated_at: string
           user_id: string
         }
@@ -115,7 +115,7 @@ export type Database = {
           id?: string
           name: string
           sport: Database["public"]["Enums"]["sport_type"]
-          team: string
+          teams: string[]
           updated_at?: string
           user_id: string
         }
@@ -124,7 +124,7 @@ export type Database = {
           id?: string
           name?: string
           sport?: Database["public"]["Enums"]["sport_type"]
-          team?: string
+          teams?: string[]
           updated_at?: string
           user_id?: string
         }

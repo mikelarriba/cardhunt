@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { PlayerWithCards, Card } from '@/types/database';
+import { PlayerWithCards, Card, SportType } from '@/types/database';
 
 export function usePlayer(playerId: string) {
   return useQuery({
     queryKey: ['player', playerId],
-    queryFn: async () => {
+    queryFn: async (): Promise<PlayerWithCards> => {
       const { data: player, error: playerError } = await supabase
         .from('players')
         .select('*')
@@ -25,8 +25,10 @@ export function usePlayer(playerId: string) {
 
       return {
         ...player,
+        sport: player.sport as SportType,
+        teams: player.teams || [],
         cards: (cards || []) as Card[],
-      } as PlayerWithCards;
+      };
     },
     enabled: !!playerId,
   });

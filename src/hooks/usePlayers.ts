@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Player, PlayerWithCards, SportType, Tag } from '@/types/database';
+import { PlayerWithCards, SportType, Tag } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 export function usePlayers() {
@@ -44,6 +44,7 @@ export function usePlayers() {
       return (players || []).map((player) => ({
         ...player,
         sport: player.sport as SportType,
+        teams: player.teams || [],
         cards: (cards || []).filter((card) => card.player_id === player.id),
         tags: tagsByPlayer[player.id] || [],
       }));
@@ -51,14 +52,16 @@ export function usePlayers() {
   });
 
   const createPlayer = useMutation({
-    mutationFn: async (player: { name: string; sport: SportType; team: string }) => {
+    mutationFn: async (player: { name: string; sport: SportType; teams: string[] }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { data, error } = await supabase
         .from('players')
         .insert({
-          ...player,
+          name: player.name,
+          sport: player.sport,
+          teams: player.teams,
           user_id: user.id,
         })
         .select()

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Building2 } from 'lucide-react';
+import { User, Building2, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { SportType, SPORTS, POPULAR_TEAMS } from '@/types/database';
 import { usePlayers } from '@/hooks/usePlayers';
 import { cn } from '@/lib/utils';
@@ -34,19 +35,27 @@ const sportEmoji: Record<SportType, string> = {
 export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
   const [name, setName] = useState('');
   const [sport, setSport] = useState<SportType | null>(null);
-  const [team, setTeam] = useState('');
+  const [teams, setTeams] = useState<string[]>([]);
   const [customTeam, setCustomTeam] = useState('');
   const { createPlayer } = usePlayers();
 
+  const handleAddTeam = (team: string) => {
+    if (team && !teams.includes(team)) {
+      setTeams([...teams, team]);
+    }
+    setCustomTeam('');
+  };
+
+  const handleRemoveTeam = (team: string) => {
+    setTeams(teams.filter(t => t !== team));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !sport) return;
-
-    const finalTeam = team || customTeam;
-    if (!finalTeam) return;
+    if (!name || !sport || teams.length === 0) return;
 
     createPlayer.mutate(
-      { name, sport, team: finalTeam },
+      { name, sport, teams },
       {
         onSuccess: () => {
           onOpenChange(false);
@@ -59,7 +68,7 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
   const resetForm = () => {
     setName('');
     setSport(null);
-    setTeam('');
+    setTeams([]);
     setCustomTeam('');
   };
 
@@ -97,7 +106,7 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
                   type="button"
                   onClick={() => {
                     setSport(s.value);
-                    setTeam('');
+                    setTeams([]);
                   }}
                   className={cn(
                     'flex flex-col items-center gap-1 p-3 rounded-lg transition-all duration-200',
@@ -113,23 +122,44 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
             </div>
           </div>
 
-          {/* Team Selection */}
+          {/* Team Selection - Multi-select */}
           {sport && (
             <div className="space-y-2 animate-fade-in">
-              <Label>Team / League</Label>
+              <Label>Teams / Leagues (select multiple)</Label>
+              
+              {/* Selected Teams */}
+              {teams.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {teams.map((team) => (
+                    <Badge
+                      key={team}
+                      variant="secondary"
+                      className="bg-primary/10 text-primary border-primary/20 pl-2 pr-1 py-1"
+                    >
+                      {team}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTeam(team)}
+                        className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2 mb-2">
                 {POPULAR_TEAMS[sport].map((t) => (
                   <button
                     key={t}
                     type="button"
-                    onClick={() => {
-                      setTeam(t);
-                      setCustomTeam('');
-                    }}
+                    onClick={() => handleAddTeam(t)}
+                    disabled={teams.includes(t)}
                     className={cn(
                       'px-3 py-1.5 rounded-lg text-sm transition-all duration-200',
-                      team === t
-                        ? 'bg-primary text-primary-foreground'
+                      teams.includes(t)
+                        ? 'bg-primary/30 text-primary cursor-not-allowed'
                         : 'bg-secondary/50 hover:bg-secondary text-muted-foreground hover:text-foreground'
                     )}
                   >
@@ -137,17 +167,30 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
                   </button>
                 ))}
               </div>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  placeholder="Or enter custom team..."
-                  value={customTeam}
-                  onChange={(e) => {
-                    setCustomTeam(e.target.value);
-                    setTeam('');
-                  }}
-                  className="pl-10 bg-secondary/50 border-border/50"
-                />
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Add custom team..."
+                    value={customTeam}
+                    onChange={(e) => setCustomTeam(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTeam(customTeam);
+                      }
+                    }}
+                    className="pl-10 bg-secondary/50 border-border/50"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleAddTeam(customTeam)}
+                  disabled={!customTeam}
+                >
+                  Add
+                </Button>
               </div>
             </div>
           )}
@@ -156,7 +199,7 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={!name || !sport || (!team && !customTeam) || createPlayer.isPending}
+            disabled={!name || !sport || teams.length === 0 || createPlayer.isPending}
           >
             {createPlayer.isPending ? 'Adding...' : 'Add Player'}
           </Button>
