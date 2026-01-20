@@ -1,0 +1,99 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Player, PlayerWithCards, SportType } from '@/types/database';
+import { useToast } from '@/hooks/use-toast';
+
+export function usePlayers() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const playersQuery = useQuery({
+    queryKey: ['players'],
+    queryFn: async (): Promise<PlayerWithCards[]> => {
+      const { data: players, error: playersError } = await supabase
+        .from('players')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (playersError) throw playersError;
+
+      const { data: cards, error: cardsError } = await supabase
+        .from('cards')
+        .select('*');
+
+      if (cardsError) throw cardsError;
+
+      return (players || []).map((player) => ({
+        ...player,
+        sport: player.sport as SportType,
+        cards: (cards || []).filter((card) => card.player_id === player.id),
+      }));
+    },
+  });
+
+  const createPlayer = useMutation({
+    mutationFn: async (player: { name: string; sport: SportType; team: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase
+        .from('players')
+        .insert({
+          ...player,
+          user_id: user.id,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      toast({
+        title: 'Player Added',
+        description: 'The player has been added to your collection.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const deletePlayer = useMutation({
+    mutationFn: async (playerId: string) => {
+      const { error } = await supabase
+        .from('players')
+        .delete()
+        .eq('id', playerId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      toast({
+        title: 'Player Deleted',
+        description: 'The player has been removed from your collection.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  return {
+    players: playersQuery.data || [],
+    isLoading: playersQuery.isLoading,
+    error: playersQuery.error,
+    createPlayer,
+    deletePlayer,
+  };
+}

@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +61,23 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        status: {
+          owned: "hsl(var(--status-owned))",
+          located: "hsl(var(--status-located))",
+          missing: "hsl(var(--status-missing))",
+        },
+        sport: {
+          football: "hsl(var(--sport-football))",
+          basketball: "hsl(var(--sport-basketball))",
+          baseball: "hsl(var(--sport-baseball))",
+          hockey: "hsl(var(--sport-hockey))",
+          soccer: "hsl(var(--sport-soccer))",
+          golf: "hsl(var(--sport-golf))",
+          tennis: "hsl(var(--sport-tennis))",
+          boxing: "hsl(var(--sport-boxing))",
+          mma: "hsl(var(--sport-mma))",
+          other: "hsl(var(--sport-other))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,25 +86,37 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.95)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "glow": {
+          "0%, 100%": { boxShadow: "0 0 10px hsl(var(--status-owned) / 0.3)" },
+          "50%": { boxShadow: "0 0 20px hsl(var(--status-owned) / 0.5)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "scale-in": "scale-in 0.2s ease-out",
+        "glow": "glow 2s ease-in-out infinite",
+      },
+      boxShadow: {
+        'card': '0 8px 32px -8px hsl(0 0% 0% / 0.4)',
+        'glow': '0 0 20px hsl(43 96% 56% / 0.15)',
+        'hover': '0 12px 40px -12px hsl(0 0% 0% / 0.5)',
       },
     },
   },
