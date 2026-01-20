@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { PlayerWithCards, Card, SportType } from '@/types/database';
+import { PlayerWithCards, Card, SportType, CardType } from '@/types/database';
 
 export function usePlayer(playerId: string) {
   return useQuery({
@@ -27,7 +27,10 @@ export function usePlayer(playerId: string) {
         ...player,
         sport: player.sport as SportType,
         teams: player.teams || [],
-        cards: (cards || []) as Card[],
+        cards: (cards || []).map((card) => ({
+          ...card,
+          card_types: (card.card_types || []) as CardType[],
+        })) as Card[],
       };
     },
     enabled: !!playerId,
