@@ -140,11 +140,13 @@ export function CardImageUpload({ cardId, currentImageUrl, onImageUpdated }: Car
 
       {previewUrl ? (
         <div className="relative group">
-          <img
-            src={previewUrl}
-            alt="Card"
-            className="w-full h-64 object-cover rounded-lg"
-          />
+          <div className="aspect-[2/3] w-full overflow-hidden rounded-lg bg-muted">
+            <img
+              src={previewUrl}
+              alt="Card"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
             <Button
               variant="secondary"
@@ -171,10 +173,10 @@ export function CardImageUpload({ cardId, currentImageUrl, onImageUpdated }: Car
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
           className={cn(
-            'w-full h-64 border-2 border-dashed border-border rounded-lg',
+            'w-full aspect-[2/3] border-2 border-dashed border-border rounded-lg',
             'flex flex-col items-center justify-center gap-3',
             'text-muted-foreground hover:text-foreground hover:border-primary/50',
-            'transition-colors cursor-pointer',
+            'transition-colors cursor-pointer bg-muted/30',
             uploading && 'opacity-50 cursor-not-allowed'
           )}
         >
@@ -183,7 +185,7 @@ export function CardImageUpload({ cardId, currentImageUrl, onImageUpdated }: Car
           ) : (
             <>
               <ImageIcon className="w-12 h-12" />
-              <span className="text-sm">Click to upload card image</span>
+              <span className="text-sm text-center px-4">Click to upload card image</span>
             </>
           )}
         </button>

@@ -8,6 +8,79 @@
 
 @layer base {
   :root {
+    /* Light theme */
+    --background: 40 30% 97%;
+    --foreground: 220 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    /* Gold/Amber primary - premium feel */
+    --primary: 43 96% 46%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 92%;
+    --secondary-foreground: 220 20% 25%;
+
+    --muted: 220 15% 94%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 43 80% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 92%;
+    --ring: 43 96% 46%;
+
+    --radius: 0.75rem;
+
+    /* Status colors */
+    --status-owned: 142 76% 36%;
+    --status-owned-glow: 142 76% 36% / 0.3;
+    --status-located: 43 96% 46%;
+    --status-located-glow: 43 96% 46% / 0.3;
+    --status-missing: 220 10% 50%;
+    --status-missing-glow: 220 10% 50% / 0.2;
+
+    /* Sport colors */
+    --sport-football: 24 95% 53%;
+    --sport-basketball: 15 90% 55%;
+    --sport-baseball: 0 72% 51%;
+    --sport-hockey: 200 80% 50%;
+    --sport-soccer: 142 70% 45%;
+    --sport-golf: 142 50% 40%;
+    --sport-tennis: 60 90% 50%;
+    --sport-boxing: 0 60% 45%;
+    --sport-mma: 280 70% 50%;
+    --sport-other: 220 10% 50%;
+
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(43 96% 46%), hsl(38 92% 38%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 15% 98%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9), hsl(220 15% 98% / 0.8));
+    
+    /* Shadows */
+    --shadow-card: 0 4px 20px -4px hsl(220 20% 15% / 0.1);
+    --shadow-glow: 0 0 20px hsl(43 96% 46% / 0.15);
+    --shadow-hover: 0 8px 30px -8px hsl(220 20% 15% / 0.15);
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 20% 15%;
+    --sidebar-primary: 43 96% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 94%;
+    --sidebar-accent-foreground: 220 20% 15%;
+    --sidebar-border: 220 15% 88%;
+    --sidebar-ring: 43 96% 46%;
+  }
+
+  .dark {
     /* Dark theme with warm amber/gold accents */
     --background: 220 20% 10%;
     --foreground: 45 30% 95%;
@@ -38,8 +111,6 @@
     --input: 220 15% 20%;
     --ring: 43 96% 56%;
 
-    --radius: 0.75rem;
-
     /* Status colors */
     --status-owned: 142 76% 45%;
     --status-owned-glow: 142 76% 45% / 0.3;
@@ -47,18 +118,6 @@
     --status-located-glow: 43 96% 56% / 0.3;
     --status-missing: 220 10% 40%;
     --status-missing-glow: 220 10% 40% / 0.2;
-
-    /* Sport colors */
-    --sport-football: 24 95% 53%;
-    --sport-basketball: 15 90% 55%;
-    --sport-baseball: 0 72% 51%;
-    --sport-hockey: 200 80% 50%;
-    --sport-soccer: 142 70% 45%;
-    --sport-golf: 142 50% 40%;
-    --sport-tennis: 60 90% 50%;
-    --sport-boxing: 0 60% 45%;
-    --sport-mma: 280 70% 50%;
-    --sport-other: 220 10% 50%;
 
     /* Gradients */
     --gradient-gold: linear-gradient(135deg, hsl(43 96% 56%), hsl(38 92% 45%));

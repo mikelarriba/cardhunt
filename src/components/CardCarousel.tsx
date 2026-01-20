@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Card } from '@/types/database';
 import { CardTypeIcon } from './CardTypeIcon';
 import { StatusBadge } from './StatusBadge';
@@ -50,26 +49,28 @@ export function CardCarousel({ cards }: CardCarouselProps) {
   }
 
   return (
-    <Carousel className="w-full max-w-3xl mx-auto">
+    <Carousel className="w-full max-w-md mx-auto">
       <CarouselContent>
         {cards.map((card) => (
           <CarouselItem key={card.id}>
-            <div className="glass-card p-6 mx-4">
-              {/* Card Image */}
-              <CardImageUpload
-                cardId={card.id}
-                currentImageUrl={card.image_url}
-                onImageUpdated={handleImageUpdated}
-              />
+            <div className="glass-card p-4 mx-2">
+              {/* Card Image - Vertical 2:3 aspect ratio */}
+              <div className="max-w-[280px] mx-auto">
+                <CardImageUpload
+                  cardId={card.id}
+                  currentImageUrl={card.image_url}
+                  onImageUpdated={handleImageUpdated}
+                />
+              </div>
 
               {/* Card Info */}
-              <div className="mt-6 space-y-4">
+              <div className="mt-4 space-y-3">
                 {/* Type and Status */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <CardTypeIcon type={card.card_type} status={card.status} size="lg" />
                     <div>
-                      <h3 className="font-display font-semibold text-lg capitalize">
+                      <h3 className="font-display font-semibold text-base capitalize">
                         {card.card_type} Card
                       </h3>
                       <StatusBadge status={card.status} size="md" />
@@ -105,8 +106,8 @@ export function CardCarousel({ cards }: CardCarouselProps) {
                 {/* Price */}
                 {card.price !== null && (
                   <div className="flex items-center gap-2 text-primary">
-                    <DollarSign className="w-5 h-5" />
-                    <span className="font-display font-semibold text-xl">
+                    <DollarSign className="w-4 h-4" />
+                    <span className="font-display font-semibold text-lg">
                       {card.price.toFixed(2)}
                     </span>
                   </div>
@@ -135,7 +136,6 @@ export function CardCarousel({ cards }: CardCarouselProps) {
                 {/* Metadata */}
                 <div className="pt-3 border-t border-border/50 text-xs text-muted-foreground">
                   <p>Added: {new Date(card.created_at).toLocaleDateString()}</p>
-                  <p>Updated: {new Date(card.updated_at).toLocaleDateString()}</p>
                 </div>
               </div>
             </div>

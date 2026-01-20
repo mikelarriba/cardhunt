@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoreVertical, Plus, Trash2, ExternalLink, Eye } from 'lucide-react';
+import { MoreVertical, Plus, Trash2, Eye } from 'lucide-react';
 import { PlayerWithCards, CardType, CARD_TYPES } from '@/types/database';
 import { CardTypeIcon } from './CardTypeIcon';
 import { SportBadge } from './SportBadge';
 import { StatusBadge } from './StatusBadge';
 import { ProgressDots } from './ProgressDots';
 import { AddCardModal } from './AddCardModal';
+import { TagManager } from './TagManager';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -41,7 +42,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
         )}
       >
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="font-display font-semibold text-lg text-foreground mb-1">
               {player.name}
@@ -74,6 +75,11 @@ export function PlayerCard({ player }: PlayerCardProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        {/* Tags */}
+        <div className="mb-4">
+          <TagManager playerId={player.id} playerTags={player.tags || []} />
         </div>
 
         {/* Card Types Grid */}
@@ -111,33 +117,6 @@ export function PlayerCard({ player }: PlayerCardProps) {
             Add Card
           </Button>
         </div>
-
-        {/* Card Details (if any cards with source URL) */}
-        {player.cards.some((c) => c.source_url) && (
-          <div className="mt-3 pt-3 border-t border-border/50">
-            <div className="space-y-2">
-              {player.cards
-                .filter((c) => c.source_url)
-                .map((card) => (
-                  <a
-                    key={card.id}
-                    href={card.source_url!}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    <span className="capitalize">{card.card_type}</span>
-                    {card.price && (
-                      <span className="text-primary font-medium">
-                        ${card.price.toFixed(2)}
-                      </span>
-                    )}
-                  </a>
-                ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <AddCardModal
