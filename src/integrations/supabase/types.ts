@@ -19,6 +19,7 @@ export type Database = {
           card_type: Database["public"]["Enums"]["card_type"]
           created_at: string
           id: string
+          image_url: string | null
           notes: string | null
           player_id: string
           price: number | null
@@ -31,6 +32,7 @@ export type Database = {
           card_type: Database["public"]["Enums"]["card_type"]
           created_at?: string
           id?: string
+          image_url?: string | null
           notes?: string | null
           player_id: string
           price?: number | null
@@ -43,6 +45,7 @@ export type Database = {
           card_type?: Database["public"]["Enums"]["card_type"]
           created_at?: string
           id?: string
+          image_url?: string | null
           notes?: string | null
           player_id?: string
           price?: number | null

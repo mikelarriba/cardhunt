@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { MoreVertical, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { MoreVertical, Plus, Trash2, ExternalLink, Eye } from 'lucide-react';
 import { PlayerWithCards, CardType, CARD_TYPES } from '@/types/database';
 import { CardTypeIcon } from './CardTypeIcon';
 import { SportBadge } from './SportBadge';
@@ -23,6 +24,7 @@ interface PlayerCardProps {
 export function PlayerCard({ player }: PlayerCardProps) {
   const [showAddCard, setShowAddCard] = useState(false);
   const { deletePlayer } = usePlayers();
+  const navigate = useNavigate();
 
   const getCardByType = (type: CardType) => {
     return player.cards.find((c) => c.card_type === type);
@@ -56,6 +58,13 @@ export function PlayerCard({ player }: PlayerCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border">
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => navigate(`/player/${player.id}`)}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                View Details
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive cursor-pointer"
                 onClick={() => deletePlayer.mutate(player.id)}
