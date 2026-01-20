@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Link2 } from 'lucide-react';
+import { DollarSign, Link2, Check } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardType, CardStatus, CARD_TYPES, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { CardTypeIcon } from './CardTypeIcon';
 import { useCards } from '@/hooks/useCards';
@@ -95,21 +94,28 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
               {CARD_TYPES.map(({ value: type, label }) => {
                 const isSelected = cardTypes.includes(type);
                 return (
-                  <button
+                  <div
                     key={type}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleTypeToggle(type)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleTypeToggle(type)}
                     className={cn(
-                      'flex items-center gap-3 p-3 rounded-lg transition-all duration-200',
+                      'flex items-center gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer',
                       isSelected
                         ? 'bg-primary/20 ring-2 ring-primary'
                         : 'bg-secondary/50 hover:bg-secondary'
                     )}
                   >
-                    <Checkbox checked={isSelected} className="pointer-events-none" />
+                    <div className={cn(
+                      'w-4 h-4 rounded border-2 flex items-center justify-center',
+                      isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'
+                    )}>
+                      {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                    </div>
                     <CardTypeIcon type={type} size="md" />
                     <span className="text-sm font-medium">{label}</span>
-                  </button>
+                  </div>
                 );
               })}
             </div>
