@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Player, PlayerWithCards, SportType } from '@/types/database';
+import { Player, PlayerWithCards, SportType, Tag } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 export function usePlayers() {
@@ -23,10 +23,29 @@ export function usePlayers() {
 
       if (cardsError) throw cardsError;
 
+      // Fetch player tags with tag details
+      const { data: playerTags, error: playerTagsError } = await supabase
+        .from('player_tags')
+        .select('player_id, tag_id, tags:tag_id(id, user_id, name, created_at)');
+
+      if (playerTagsError) throw playerTagsError;
+
+      // Group tags by player
+      const tagsByPlayer: Record<string, Tag[]> = {};
+      (playerTags || []).forEach((pt: any) => {
+        if (pt.tags) {
+          if (!tagsByPlayer[pt.player_id]) {
+            tagsByPlayer[pt.player_id] = [];
+          }
+          tagsByPlayer[pt.player_id].push(pt.tags as Tag);
+        }
+      });
+
       return (players || []).map((player) => ({
         ...player,
         sport: player.sport as SportType,
         cards: (cards || []).filter((card) => card.player_id === player.id),
+        tags: tagsByPlayer[player.id] || [],
       }));
     },
   });

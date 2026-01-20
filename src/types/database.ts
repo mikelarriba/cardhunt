@@ -2,6 +2,20 @@ export type SportType = 'football' | 'basketball' | 'baseball' | 'hockey' | 'soc
 export type CardType = 'rookie' | 'regular' | 'signed' | 'rated';
 export type CardStatus = 'owned' | 'located' | 'missing';
 
+export interface Tag {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface PlayerTag {
+  id: string;
+  player_id: string;
+  tag_id: string;
+  created_at: string;
+}
+
 export interface Player {
   id: string;
   user_id: string;
@@ -28,6 +42,7 @@ export interface Card {
 
 export interface PlayerWithCards extends Player {
   cards: Card[];
+  tags?: Tag[];
 }
 
 export const SPORTS: { value: SportType; label: string }[] = [

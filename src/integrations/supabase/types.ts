@@ -64,6 +64,42 @@ export type Database = {
           },
         ]
       }
+      player_tags: {
+        Row: {
+          created_at: string
+          id: string
+          player_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_tags_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           created_at: string
@@ -90,6 +126,27 @@ export type Database = {
           sport?: Database["public"]["Enums"]["sport_type"]
           team?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
           user_id?: string
         }
         Relationships: []

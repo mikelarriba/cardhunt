@@ -1,23 +1,33 @@
 import { useState, useMemo } from 'react';
-import { Plus, LogOut, Sparkles, LayoutGrid, List } from 'lucide-react';
+import { Plus, LogOut, Sparkles, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { AddPlayerModal } from './AddPlayerModal';
 import { FilterBar } from './FilterBar';
+import { CollectionSummary } from './CollectionSummary';
+import { ThemeToggle } from './ThemeToggle';
 import { usePlayers } from '@/hooks/usePlayers';
+import { useTags } from '@/hooks/useTags';
 import { useAuth } from '@/hooks/useAuth';
 import { SportType, CardStatus } from '@/types/database';
-import { cn } from '@/lib/utils';
 
 export function Dashboard() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CardStatus | 'all'>('all');
+  const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
   const { players, isLoading } = usePlayers();
+  const { tags } = useTags();
   const { signOut, user } = useAuth();
 
   const filteredPlayers = useMemo(() => {
     return players.filter((player) => {
+      // Filter by tag/collection
+      if (selectedTag !== 'all') {
+        const hasTag = player.tags?.some(t => t.id === selectedTag);
+        if (!hasTag) return false;
+      }
+
       // Filter by sport
       if (selectedSport !== 'all' && player.sport !== selectedSport) {
         return false;
@@ -33,7 +43,7 @@ export function Dashboard() {
 
       return true;
     });
-  }, [players, selectedSport, selectedStatus]);
+  }, [players, selectedSport, selectedStatus, selectedTag]);
 
   const stats = useMemo(() => {
     const allCards = players.flatMap((p) => p.cards);
@@ -48,8 +58,13 @@ export function Dashboard() {
     };
   }, [players]);
 
+  const selectedTagName = useMemo(() => {
+    if (selectedTag === 'all') return null;
+    return tags.find(t => t.id === selectedTag)?.name || null;
+  }, [selectedTag, tags]);
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -67,7 +82,8 @@ export function Dashboard() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Button
                 onClick={() => setShowAddPlayer(true)}
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -128,9 +144,19 @@ export function Dashboard() {
         <FilterBar
           selectedSport={selectedSport}
           selectedStatus={selectedStatus}
+          selectedTag={selectedTag}
           onSportChange={setSelectedSport}
           onStatusChange={setSelectedStatus}
+          onTagChange={setSelectedTag}
         />
+
+        {/* Collection Summary when viewing a specific collection */}
+        {selectedTagName && filteredPlayers.length > 0 && (
+          <CollectionSummary 
+            collectionName={selectedTagName} 
+            players={filteredPlayers} 
+          />
+        )}
 
         {/* Players Grid */}
         {isLoading ? (
