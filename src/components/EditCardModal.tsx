@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DollarSign, Link2 } from 'lucide-react';
 import {
   Dialog,
@@ -11,38 +11,44 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CardType, CardStatus, Card, CARD_TYPES, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
+import { Card, CardType, CardStatus, CARD_TYPES, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { CardTypeIcon } from './CardTypeIcon';
 import { useCards } from '@/hooks/useCards';
 import { cn } from '@/lib/utils';
 
-interface AddCardModalProps {
+interface EditCardModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  playerId: string;
-  playerName: string;
-  existingCards: Card[];
+  card: Card;
 }
 
-export function AddCardModal({
-  open,
-  onOpenChange,
-  playerId,
-  playerName,
-  existingCards,
-}: AddCardModalProps) {
-  const [cardTypes, setCardTypes] = useState<CardType[]>([]);
-  const [status, setStatus] = useState<CardStatus>('missing');
-  const [price, setPrice] = useState('');
-  const [sourceUrl, setSourceUrl] = useState('');
-  const [notes, setNotes] = useState('');
-  const [brand, setBrand] = useState('');
+export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) {
+  const [cardTypes, setCardTypes] = useState<CardType[]>(card.card_types?.length ? card.card_types : [card.card_type]);
+  const [status, setStatus] = useState<CardStatus>(card.status);
+  const [price, setPrice] = useState(card.price?.toString() || '');
+  const [sourceUrl, setSourceUrl] = useState(card.source_url || '');
+  const [notes, setNotes] = useState(card.notes || '');
+  const [brand, setBrand] = useState(card.brand || '');
   const [customBrand, setCustomBrand] = useState('');
-  const { createCard } = useCards();
+  const { updateCard } = useCards();
+
+  useEffect(() => {
+    if (open) {
+      setCardTypes(card.card_types?.length ? card.card_types : [card.card_type]);
+      setStatus(card.status);
+      setPrice(card.price?.toString() || '');
+      setSourceUrl(card.source_url || '');
+      setNotes(card.notes || '');
+      setBrand(card.brand || '');
+      setCustomBrand('');
+    }
+  }, [open, card]);
 
   const handleTypeToggle = (type: CardType) => {
     if (cardTypes.includes(type)) {
-      setCardTypes(cardTypes.filter(t => t !== type));
+      if (cardTypes.length > 1) {
+        setCardTypes(cardTypes.filter(t => t !== type));
+      }
     } else {
       setCardTypes([...cardTypes, type]);
     }
@@ -54,47 +60,35 @@ export function AddCardModal({
 
     const finalBrand = brand === 'custom' ? customBrand : brand;
 
-    createCard.mutate(
+    updateCard.mutate(
       {
-        player_id: playerId,
-        card_type: cardTypes[0], // Primary type for legacy support
-        card_types: cardTypes,
-        status,
-        price: price ? parseFloat(price) : null,
-        source_url: sourceUrl || null,
-        notes: notes || null,
-        brand: finalBrand || null,
+        cardId: card.id,
+        updates: {
+          card_types: cardTypes,
+          status,
+          price: price ? parseFloat(price) : null,
+          source_url: sourceUrl || null,
+          notes: notes || null,
+          brand: finalBrand || null,
+        },
       },
       {
         onSuccess: () => {
           onOpenChange(false);
-          resetForm();
         },
       }
     );
-  };
-
-  const resetForm = () => {
-    setCardTypes([]);
-    setStatus('missing');
-    setPrice('');
-    setSourceUrl('');
-    setNotes('');
-    setBrand('');
-    setCustomBrand('');
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">
-            Add Card for {playerName}
-          </DialogTitle>
+          <DialogTitle className="font-display text-xl">Edit Card</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Card Type Selection - Multi-select */}
+          {/* Card Types - Multi-select */}
           <div className="space-y-2">
             <Label>Card Types (select multiple)</Label>
             <div className="grid grid-cols-2 gap-3">
@@ -145,7 +139,7 @@ export function AddCardModal({
                 onClick={() => setBrand('custom')}
                 className={cn(
                   'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
-                  brand === 'custom'
+                  brand === 'custom' || (brand && !CARD_BRANDS.includes(brand as any))
                     ? 'bg-primary/20 text-primary ring-1 ring-primary'
                     : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
                 )}
@@ -153,11 +147,17 @@ export function AddCardModal({
                 Custom
               </button>
             </div>
-            {brand === 'custom' && (
+            {(brand === 'custom' || (brand && !CARD_BRANDS.includes(brand as any))) && (
               <Input
                 placeholder="Enter brand name..."
-                value={customBrand}
-                onChange={(e) => setCustomBrand(e.target.value)}
+                value={brand === 'custom' ? customBrand : brand}
+                onChange={(e) => {
+                  if (brand === 'custom') {
+                    setCustomBrand(e.target.value);
+                  } else {
+                    setBrand(e.target.value);
+                  }
+                }}
                 className="mt-2 bg-secondary/50 border-border/50"
               />
             )}
@@ -244,9 +244,9 @@ export function AddCardModal({
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={cardTypes.length === 0 || createCard.isPending}
+            disabled={cardTypes.length === 0 || updateCard.isPending}
           >
-            {createCard.isPending ? 'Adding...' : 'Add Card'}
+            {updateCard.isPending ? 'Saving...' : 'Save Changes'}
           </Button>
         </form>
       </DialogContent>

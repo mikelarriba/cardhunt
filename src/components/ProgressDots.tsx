@@ -5,11 +5,12 @@ interface ProgressDotsProps {
   cards: Card[];
 }
 
-const cardTypes: CardType[] = ['rookie', 'regular', 'signed', 'rated'];
+const cardTypes: CardType[] = ['rookie', 'regular', 'autographed', 'rated'];
 
 export function ProgressDots({ cards }: ProgressDotsProps) {
   const getCardStatus = (type: CardType) => {
-    const card = cards.find((c) => c.card_type === type);
+    // Check both legacy card_type and new card_types array
+    const card = cards.find((c) => c.card_type === type || c.card_types?.includes(type));
     return card?.status;
   };
 

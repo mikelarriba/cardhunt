@@ -14,14 +14,14 @@ interface CardTypeIconProps {
 const iconMap = {
   rookie: Star,
   regular: Square,
-  signed: PenTool,
+  autographed: PenTool,
   rated: Award,
 };
 
 const labelMap = {
   rookie: 'Rookie',
   regular: 'Regular',
-  signed: 'Signed',
+  autographed: 'Autographed',
   rated: 'Rated',
 };
 

@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil } from 'lucide-react';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useAuth } from '@/hooks/useAuth';
 import { CardCarousel } from '@/components/CardCarousel';
 import { SportBadge } from '@/components/SportBadge';
 import { ProgressDots } from '@/components/ProgressDots';
 import { AddCardModal } from '@/components/AddCardModal';
+import { EditPlayerModal } from '@/components/EditPlayerModal';
 import { TeamPillList } from '@/components/TeamPill';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ export default function PlayerDetail() {
   const { user, loading: authLoading } = useAuth();
   const { data: player, isLoading, error } = usePlayer(id || '');
   const [showAddCard, setShowAddCard] = useState(false);
+  const [showEditPlayer, setShowEditPlayer] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -84,10 +86,20 @@ export default function PlayerDetail() {
               </div>
             </div>
             
-            <Button onClick={() => setShowAddCard(true)} className="bg-primary hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Card
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowEditPlayer(true)}
+              >
+                <Pencil className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+              <Button onClick={() => setShowAddCard(true)} className="bg-primary hover:bg-primary/90">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Card
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -121,6 +133,14 @@ export default function PlayerDetail() {
         playerName={player.name}
         existingCards={player.cards}
       />
+
+      {showEditPlayer && (
+        <EditPlayerModal
+          open={showEditPlayer}
+          onOpenChange={setShowEditPlayer}
+          player={player}
+        />
+      )}
     </div>
   );
 }

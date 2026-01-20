@@ -11,10 +11,12 @@ export function useCards() {
     mutationFn: async (card: {
       player_id: string;
       card_type: CardType;
+      card_types?: CardType[];
       status: CardStatus;
       price?: number | null;
       source_url?: string | null;
       notes?: string | null;
+      brand?: string | null;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -23,6 +25,7 @@ export function useCards() {
         .from('cards')
         .insert({
           ...card,
+          card_types: card.card_types || [card.card_type],
           user_id: user.id,
         })
         .select()
@@ -33,6 +36,7 @@ export function useCards() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['player'] });
       toast({
         title: 'Card Added',
         description: 'The card has been added to your collection.',
@@ -55,9 +59,11 @@ export function useCards() {
       cardId: string;
       updates: Partial<{
         status: CardStatus;
+        card_types: CardType[];
         price: number | null;
         source_url: string | null;
         notes: string | null;
+        brand: string | null;
       }>;
     }) => {
       const { data, error } = await supabase
@@ -72,6 +78,7 @@ export function useCards() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['player'] });
       toast({
         title: 'Card Updated',
         description: 'The card has been updated.',
@@ -97,6 +104,7 @@ export function useCards() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['player'] });
       toast({
         title: 'Card Deleted',
         description: 'The card has been removed from your collection.',
