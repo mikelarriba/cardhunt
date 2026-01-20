@@ -1,5 +1,5 @@
 export type SportType = 'football' | 'basketball' | 'baseball' | 'hockey' | 'soccer' | 'golf' | 'tennis' | 'boxing' | 'mma' | 'other';
-export type CardType = 'rookie' | 'regular' | 'signed' | 'rated';
+export type CardType = 'rookie' | 'regular' | 'autographed' | 'rated';
 export type CardStatus = 'owned' | 'located' | 'missing';
 
 export interface Tag {
@@ -32,11 +32,13 @@ export interface Card {
   player_id: string;
   user_id: string;
   card_type: CardType;
+  card_types: CardType[];
   status: CardStatus;
   price: number | null;
   source_url: string | null;
   notes: string | null;
   image_url: string | null;
+  brand: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -62,7 +64,7 @@ export const SPORTS: { value: SportType; label: string }[] = [
 export const CARD_TYPES: { value: CardType; label: string }[] = [
   { value: 'rookie', label: 'Rookie' },
   { value: 'regular', label: 'Regular' },
-  { value: 'signed', label: 'Signed' },
+  { value: 'autographed', label: 'Autographed' },
   { value: 'rated', label: 'Rated' },
 ];
 
@@ -71,6 +73,14 @@ export const CARD_STATUSES: { value: CardStatus; label: string }[] = [
   { value: 'located', label: 'Located' },
   { value: 'missing', label: 'Missing' },
 ];
+
+export const CARD_BRANDS = [
+  'Panini',
+  'Upper Deck',
+  'Topps',
+] as const;
+
+export type CardBrand = typeof CARD_BRANDS[number] | string;
 
 export const POPULAR_TEAMS: Record<SportType, string[]> = {
   football: ['Dallas Cowboys', 'New England Patriots', 'Kansas City Chiefs', 'San Francisco 49ers', 'Green Bay Packers'],

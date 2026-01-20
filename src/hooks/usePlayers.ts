@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { PlayerWithCards, SportType, Tag } from '@/types/database';
+import { PlayerWithCards, SportType, Tag, CardType } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 export function usePlayers() {
@@ -45,7 +45,12 @@ export function usePlayers() {
         ...player,
         sport: player.sport as SportType,
         teams: player.teams || [],
-        cards: (cards || []).filter((card) => card.player_id === player.id),
+        cards: (cards || [])
+          .filter((card) => card.player_id === player.id)
+          .map((card) => ({
+            ...card,
+            card_types: (card.card_types || []) as CardType[],
+          })),
         tags: tagsByPlayer[player.id] || [],
       }));
     },
@@ -75,6 +80,45 @@ export function usePlayers() {
       toast({
         title: 'Player Added',
         description: 'The player has been added to your collection.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const updatePlayer = useMutation({
+    mutationFn: async ({
+      playerId,
+      updates,
+    }: {
+      playerId: string;
+      updates: Partial<{
+        name: string;
+        sport: SportType;
+        teams: string[];
+      }>;
+    }) => {
+      const { data, error } = await supabase
+        .from('players')
+        .update(updates)
+        .eq('id', playerId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['player'] });
+      toast({
+        title: 'Player Updated',
+        description: 'The player has been updated.',
       });
     },
     onError: (error) => {
@@ -116,6 +160,7 @@ export function usePlayers() {
     isLoading: playersQuery.isLoading,
     error: playersQuery.error,
     createPlayer,
+    updatePlayer,
     deletePlayer,
   };
 }

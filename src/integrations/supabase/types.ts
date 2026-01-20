@@ -16,7 +16,9 @@ export type Database = {
     Tables: {
       cards: {
         Row: {
+          brand: string | null
           card_type: Database["public"]["Enums"]["card_type"]
+          card_types: string[] | null
           created_at: string
           id: string
           image_url: string | null
@@ -29,7 +31,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          brand?: string | null
           card_type: Database["public"]["Enums"]["card_type"]
+          card_types?: string[] | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -42,7 +46,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          brand?: string | null
           card_type?: Database["public"]["Enums"]["card_type"]
+          card_types?: string[] | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -160,7 +166,7 @@ export type Database = {
     }
     Enums: {
       card_status: "owned" | "located" | "missing"
-      card_type: "rookie" | "regular" | "signed" | "rated"
+      card_type: "rookie" | "regular" | "autographed" | "rated"
       sport_type:
         | "football"
         | "basketball"
@@ -300,7 +306,7 @@ export const Constants = {
   public: {
     Enums: {
       card_status: ["owned", "located", "missing"],
-      card_type: ["rookie", "regular", "signed", "rated"],
+      card_type: ["rookie", "regular", "autographed", "rated"],
       sport_type: [
         "football",
         "basketball",
