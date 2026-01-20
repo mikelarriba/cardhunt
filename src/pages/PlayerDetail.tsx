@@ -6,6 +6,8 @@ import { CardCarousel } from '@/components/CardCarousel';
 import { SportBadge } from '@/components/SportBadge';
 import { ProgressDots } from '@/components/ProgressDots';
 import { AddCardModal } from '@/components/AddCardModal';
+import { TeamPillList } from '@/components/TeamPill';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useEffect } from 'react';
@@ -59,24 +61,26 @@ export default function PlayerDetail() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
         <div className="max-w-4xl mx-auto px-6 py-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <ThemeToggle />
+          </div>
           
           <div className="flex items-start justify-between">
             <div>
               <h1 className="font-display font-bold text-3xl text-foreground mb-2">
                 {player.name}
               </h1>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <SportBadge sport={player.sport} />
-                <span className="text-muted-foreground">{player.team}</span>
+                <TeamPillList teams={player.teams} maxVisible={4} size="md" />
               </div>
             </div>
             

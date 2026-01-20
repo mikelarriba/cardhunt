@@ -21,7 +21,8 @@ export interface Player {
   user_id: string;
   name: string;
   sport: SportType;
-  team: string;
+  teams: string[];
+  image_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -82,4 +83,33 @@ export const POPULAR_TEAMS: Record<SportType, string[]> = {
   boxing: ['WBC', 'WBA', 'IBF', 'WBO', 'Matchroom'],
   mma: ['UFC', 'Bellator', 'ONE Championship', 'PFL', 'Rizin'],
   other: ['Team A', 'Team B', 'Team C', 'Team D', 'Team E'],
+};
+
+// Team colors for fallback logos
+export const TEAM_COLORS: Record<string, string> = {
+  'Dallas Cowboys': '#003594',
+  'New England Patriots': '#002244',
+  'Kansas City Chiefs': '#E31837',
+  'San Francisco 49ers': '#AA0000',
+  'Green Bay Packers': '#203731',
+  'Los Angeles Lakers': '#552583',
+  'Boston Celtics': '#007A33',
+  'Chicago Bulls': '#CE1141',
+  'Golden State Warriors': '#1D428A',
+  'Miami Heat': '#98002E',
+  'New York Yankees': '#003087',
+  'Los Angeles Dodgers': '#005A9C',
+  'Boston Red Sox': '#BD3039',
+  'Chicago Cubs': '#0E3386',
+  'Atlanta Braves': '#CE1141',
+  'Toronto Maple Leafs': '#00205B',
+  'Montreal Canadiens': '#AF1E2D',
+  'Boston Bruins': '#FFB81C',
+  'New York Rangers': '#0038A8',
+  'Chicago Blackhawks': '#CF0A2C',
+  'Manchester United': '#DA291C',
+  'Real Madrid': '#FEBE10',
+  'Barcelona': '#A50044',
+  'Liverpool': '#C8102E',
+  'Bayern Munich': '#DC052D',
 };

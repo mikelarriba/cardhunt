@@ -1,1 +1,4 @@
 project_id = "bwvwylqltmougniyfrcx"
+
+[functions.generate-player-image]
+verify_jwt = false
