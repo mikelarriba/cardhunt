@@ -2,14 +2,18 @@ import { useState, useMemo } from 'react';
 import { Plus, LogOut, Sparkles, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
+import { CompactPlayerCard } from './CompactPlayerCard';
+import { PlayersTable } from './PlayersTable';
 import { AddPlayerModal } from './AddPlayerModal';
 import { AddPlayerDropdown } from './AddPlayerDropdown';
 import { FilterBar } from './FilterBar';
 import { CollectionSummary } from './CollectionSummary';
 import { ThemeToggle } from './ThemeToggle';
+import { ViewSwitcher } from './ViewSwitcher';
 import { usePlayers } from '@/hooks/usePlayers';
 import { useTags } from '@/hooks/useTags';
 import { useAuth } from '@/hooks/useAuth';
+import { useViewMode } from '@/hooks/useViewMode';
 import { SportType, CardStatus } from '@/types/database';
 
 export function Dashboard() {
@@ -17,6 +21,7 @@ export function Dashboard() {
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CardStatus | 'all'>('all');
   const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
+  const [viewMode, setViewMode] = useViewMode();
   const { players, isLoading } = usePlayers();
   const { tags } = useTags();
   const { signOut, user } = useAuth();
@@ -135,15 +140,18 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Filter Bar */}
-        <FilterBar
-          selectedSport={selectedSport}
-          selectedStatus={selectedStatus}
-          selectedTag={selectedTag}
-          onSportChange={setSelectedSport}
-          onStatusChange={setSelectedStatus}
-          onTagChange={setSelectedTag}
-        />
+        {/* Filter Bar with View Switcher */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <FilterBar
+            selectedSport={selectedSport}
+            selectedStatus={selectedStatus}
+            selectedTag={selectedTag}
+            onSportChange={setSelectedSport}
+            onStatusChange={setSelectedStatus}
+            onTagChange={setSelectedTag}
+          />
+          <ViewSwitcher value={viewMode} onChange={setViewMode} />
+        </div>
 
         {/* Collection Summary when viewing a specific collection */}
         {selectedTagName && filteredPlayers.length > 0 && (
@@ -185,6 +193,14 @@ export function Dashboard() {
                 Add Your First Player
               </Button>
             )}
+          </div>
+        ) : viewMode === 'table' ? (
+          <PlayersTable players={filteredPlayers} />
+        ) : viewMode === 'compact' ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            {filteredPlayers.map((player) => (
+              <CompactPlayerCard key={player.id} player={player} />
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
