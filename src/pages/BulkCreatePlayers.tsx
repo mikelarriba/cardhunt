@@ -121,6 +121,45 @@ export default function BulkCreatePlayers() {
     }
   }, [rows, handleAddTeam]);
 
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>, rowIndex: number) => {
+    const pastedText = e.clipboardData.getData('text');
+    
+    // Split by newlines or tabs (common spreadsheet formats)
+    const names = pastedText
+      .split(/[\n\r\t]+/)
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+    
+    // If only one name, let default paste behavior handle it
+    if (names.length <= 1) return;
+    
+    e.preventDefault();
+    
+    setRows(prev => {
+      const newRows = [...prev];
+      
+      // Fill existing rows starting from current index
+      for (let i = 0; i < names.length; i++) {
+        const targetIndex = rowIndex + i;
+        
+        if (targetIndex < newRows.length) {
+          // Update existing row
+          newRows[targetIndex] = { ...newRows[targetIndex], name: names[i] };
+        } else {
+          // Create new row
+          const newRow = createEmptyRow();
+          newRow.name = names[i];
+          if (bulkSportEnabled && bulkSport) {
+            newRow.sport = bulkSport;
+          }
+          newRows.push(newRow);
+        }
+      }
+      
+      return newRows;
+    });
+  }, [bulkSportEnabled, bulkSport]);
+
   const getValidRows = useCallback(() => {
     return rows.filter(
       (row) => row.name.trim() && row.sport && row.teams.length > 0
@@ -287,10 +326,11 @@ export default function BulkCreatePlayers() {
                 >
                   {/* Player Name */}
                   <Input
-                    placeholder="e.g., Michael Jordan"
+                    placeholder="e.g., Michael Jordan (paste list here)"
                     value={row.name}
                     onChange={(e) => updateRow(row.id, { name: e.target.value })}
                     onKeyDown={(e) => handleKeyDown(e, index, 'name')}
+                    onPaste={(e) => handlePaste(e, index)}
                     className="bg-secondary/50 border-border/50"
                   />
 
