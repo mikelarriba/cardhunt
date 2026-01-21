@@ -3,6 +3,7 @@ import { Plus, LogOut, Sparkles, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { AddPlayerModal } from './AddPlayerModal';
+import { AddPlayerDropdown } from './AddPlayerDropdown';
 import { FilterBar } from './FilterBar';
 import { CollectionSummary } from './CollectionSummary';
 import { ThemeToggle } from './ThemeToggle';
@@ -84,13 +85,7 @@ export function Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              <Button
-                onClick={() => setShowAddPlayer(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Player
-              </Button>
+              <AddPlayerDropdown onAddSingle={() => setShowAddPlayer(true)} />
               <Button
                 variant="ghost"
                 size="icon"
