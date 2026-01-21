@@ -28,6 +28,13 @@ export function Dashboard() {
   const { tags } = useTags();
   const { signOut, user } = useAuth();
 
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      console.warn('Logout warning:', error.message);
+    }
+  };
+
   // Get all unique teams from players
   const availableTeams = useMemo(() => {
     const teamsSet = new Set<string>();
@@ -141,7 +148,7 @@ export function Dashboard() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <LogOut className="w-5 h-5" />

@@ -57,7 +57,14 @@ export function useAuth() {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
+    // Use 'local' scope to ensure local storage is cleared
+    // even if the server session is already invalidated
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
+    
+    // Force clear user state in case the auth listener doesn't fire
+    setUser(null);
+    setSession(null);
+    
     return { error };
   };
 
