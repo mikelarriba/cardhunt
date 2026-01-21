@@ -54,10 +54,11 @@ function Logo({ className }: { className?: string }) {
 
 function AuthCard() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signIn, signInWithGoogle } = useAuth();
+  const { signUp, signIn, signInWithGoogle, resetPassword } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,7 +66,15 @@ function AuthCard() {
     setLoading(true);
 
     try {
-      if (isSignUp) {
+      if (isForgotPassword) {
+        const { error } = await resetPassword(email);
+        if (error) throw error;
+        toast({
+          title: 'Check Your Email',
+          description: 'We sent you a password reset link.',
+        });
+        setIsForgotPassword(false);
+      } else if (isSignUp) {
         const { error } = await signUp(email, password);
         if (error) throw error;
         toast({
@@ -111,33 +120,41 @@ function AuthCard() {
     <div className="glass-card w-full max-w-md p-8 backdrop-blur-xl bg-card/80 border border-border/50 shadow-2xl">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-display font-bold text-foreground mb-1">
-          {isSignUp ? 'Create Account' : 'Welcome Back'}
+          {isForgotPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Welcome Back'}
         </h2>
         <p className="text-sm text-muted-foreground">
-          {isSignUp ? 'Start tracking your collection today' : 'Sign in to continue'}
+          {isForgotPassword 
+            ? 'Enter your email to receive a reset link' 
+            : isSignUp 
+              ? 'Start tracking your collection today' 
+              : 'Sign in to continue'}
         </p>
       </div>
 
-      {/* Google Sign In */}
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full mb-4 h-11 bg-background/50 border-border/50 hover:bg-secondary/80 transition-colors"
-        onClick={handleGoogleSignIn}
-        disabled={loading}
-      >
-        <Chrome className="w-5 h-5 mr-2" />
-        Continue with Google
-      </Button>
+      {!isForgotPassword && (
+        <>
+          {/* Google Sign In */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full mb-4 h-11 bg-background/50 border-border/50 hover:bg-secondary/80 transition-colors"
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+          >
+            <Chrome className="w-5 h-5 mr-2" />
+            Continue with Google
+          </Button>
 
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border/50" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">or</span>
-        </div>
-      </div>
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border/50" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
+        </>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
@@ -156,40 +173,62 @@ function AuthCard() {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary/50"
-              minLength={6}
-              required
-            />
+        {!isForgotPassword && (
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10 h-11 bg-background/50 border-border/50 focus:border-primary/50"
+                minLength={6}
+                required
+              />
+            </div>
           </div>
-        </div>
+        )}
+
+        {!isForgotPassword && !isSignUp && (
+          <button
+            type="button"
+            onClick={() => setIsForgotPassword(true)}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            Forgot password?
+          </button>
+        )}
 
         <Button
           type="submit"
           className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold transition-all"
           disabled={loading}
         >
-          {loading ? 'Loading...' : isSignUp ? 'Create Account' : 'Sign In'}
+          {loading ? 'Loading...' : isForgotPassword ? 'Send Reset Link' : isSignUp ? 'Create Account' : 'Sign In'}
         </Button>
       </form>
 
       <div className="mt-6 text-center">
-        <button
-          type="button"
-          onClick={() => setIsSignUp(!isSignUp)}
-          className="text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-        </button>
+        {isForgotPassword ? (
+          <button
+            type="button"
+            onClick={() => setIsForgotPassword(false)}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            Back to sign in
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+          </button>
+        )}
       </div>
     </div>
   );
