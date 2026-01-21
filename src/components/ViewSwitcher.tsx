@@ -21,8 +21,9 @@ export function ViewSwitcher({ value, onChange }: ViewSwitcherProps) {
         value="standard"
         aria-label="Standard view"
         className={cn(
-          'px-3 py-1.5 text-xs gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm',
-          'hover:bg-background/50 transition-colors'
+          'px-3 py-1.5 text-xs gap-1.5 rounded-md transition-all duration-200',
+          'hover:bg-muted/50',
+          'data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-md'
         )}
       >
         <LayoutGrid className="w-4 h-4" />
@@ -32,8 +33,9 @@ export function ViewSwitcher({ value, onChange }: ViewSwitcherProps) {
         value="compact"
         aria-label="Compact view"
         className={cn(
-          'px-3 py-1.5 text-xs gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm',
-          'hover:bg-background/50 transition-colors'
+          'px-3 py-1.5 text-xs gap-1.5 rounded-md transition-all duration-200',
+          'hover:bg-muted/50',
+          'data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-md'
         )}
       >
         <Grid3X3 className="w-4 h-4" />
@@ -43,8 +45,9 @@ export function ViewSwitcher({ value, onChange }: ViewSwitcherProps) {
         value="table"
         aria-label="Table view"
         className={cn(
-          'px-3 py-1.5 text-xs gap-1.5 data-[state=on]:bg-background data-[state=on]:shadow-sm',
-          'hover:bg-background/50 transition-colors'
+          'px-3 py-1.5 text-xs gap-1.5 rounded-md transition-all duration-200',
+          'hover:bg-muted/50',
+          'data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:shadow-md'
         )}
       >
         <List className="w-4 h-4" />
