@@ -141,7 +141,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
 
             {/* Teams - Scrollable */}
             <div className="overflow-x-auto scrollbar-hide">
-              <TeamPillList teams={player.teams} maxVisible={2} />
+              <TeamPillList teams={player.teams} sport={player.sport} maxVisible={2} />
             </div>
 
             {/* Card Type Icons */}

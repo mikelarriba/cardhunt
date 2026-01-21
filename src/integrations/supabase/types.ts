@@ -157,6 +157,36 @@ export type Database = {
         }
         Relationships: []
       }
+      team_logos: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          sport: Database["public"]["Enums"]["sport_type"]
+          team_name: string
+          thesportsdb_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          sport: Database["public"]["Enums"]["sport_type"]
+          team_name: string
+          thesportsdb_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          sport?: Database["public"]["Enums"]["sport_type"]
+          team_name?: string
+          thesportsdb_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

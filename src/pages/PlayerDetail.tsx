@@ -103,7 +103,7 @@ export default function PlayerDetail() {
               </h1>
               <div className="flex items-center gap-3 flex-wrap">
                 <SportBadge sport={player.sport} />
-                <TeamPillList teams={player.teams} maxVisible={4} size="md" />
+                <TeamPillList teams={player.teams} sport={player.sport} maxVisible={4} size="md" />
               </div>
             </div>
             
