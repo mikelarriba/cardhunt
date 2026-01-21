@@ -137,7 +137,7 @@ export function Dashboard() {
               </div>
               <div>
                 <h1 className="font-display font-bold text-xl text-gradient-gold">
-                  Card Tracker
+                  Card Hunt
                 </h1>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>

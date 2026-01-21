@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Link2, Check } from 'lucide-react';
+import { DollarSign, Link2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardType, CardStatus, CARD_TYPES, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
-import { CardTypeIcon } from './CardTypeIcon';
+import { Card, CardStatus, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { useCards } from '@/hooks/useCards';
 import { cn } from '@/lib/utils';
+import { DualImageUpload } from './DualImageUpload';
+import { SerialNumberInput } from './SerialNumberInput';
+import { SeriesInput } from './SeriesInput';
+import { CardLabelsInput } from './CardLabelsInput';
 
 interface EditCardModalProps {
   open: boolean;
@@ -22,40 +25,46 @@ interface EditCardModalProps {
 }
 
 export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) {
-  const [cardTypes, setCardTypes] = useState<CardType[]>(card.card_types?.length ? card.card_types : [card.card_type]);
+  // Card labels
+  const [cardLabels, setCardLabels] = useState<string[]>(card.card_labels || []);
   const [status, setStatus] = useState<CardStatus>(card.status);
   const [price, setPrice] = useState(card.price?.toString() || '');
   const [sourceUrl, setSourceUrl] = useState(card.source_url || '');
   const [notes, setNotes] = useState(card.notes || '');
   const [brand, setBrand] = useState(card.brand || '');
   const [customBrand, setCustomBrand] = useState('');
+  
+  // New fields
+  const [series, setSeries] = useState(card.series || '');
+  const [isNumbered, setIsNumbered] = useState(card.is_numbered || false);
+  const [serialNum, setSerialNum] = useState(card.serial_num?.toString() || '');
+  const [serialTotal, setSerialTotal] = useState(card.serial_total?.toString() || '');
+  const [imageFront, setImageFront] = useState<string | null>(card.image_front || card.image_url);
+  const [imageBack, setImageBack] = useState<string | null>(card.image_back || null);
+
   const { updateCard } = useCards();
 
   useEffect(() => {
     if (open) {
-      setCardTypes(card.card_types?.length ? card.card_types : [card.card_type]);
+      setCardLabels(card.card_labels || []);
       setStatus(card.status);
       setPrice(card.price?.toString() || '');
       setSourceUrl(card.source_url || '');
       setNotes(card.notes || '');
       setBrand(card.brand || '');
       setCustomBrand('');
+      setSeries(card.series || '');
+      setIsNumbered(card.is_numbered || false);
+      setSerialNum(card.serial_num?.toString() || '');
+      setSerialTotal(card.serial_total?.toString() || '');
+      setImageFront(card.image_front || card.image_url);
+      setImageBack(card.image_back || null);
     }
   }, [open, card]);
 
-  const handleTypeToggle = (type: CardType) => {
-    if (cardTypes.includes(type)) {
-      if (cardTypes.length > 1) {
-        setCardTypes(cardTypes.filter(t => t !== type));
-      }
-    } else {
-      setCardTypes([...cardTypes, type]);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (cardTypes.length === 0) return;
+    if (cardLabels.length === 0) return;
 
     const finalBrand = brand === 'custom' ? customBrand : brand;
 
@@ -63,12 +72,18 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
       {
         cardId: card.id,
         updates: {
-          card_types: cardTypes,
+          card_labels: cardLabels,
           status,
           price: price ? parseFloat(price) : null,
           source_url: sourceUrl || null,
           notes: notes || null,
           brand: finalBrand || null,
+          series: series || null,
+          is_numbered: isNumbered,
+          serial_num: isNumbered && serialNum ? parseInt(serialNum) : null,
+          serial_total: isNumbered && serialTotal ? parseInt(serialTotal) : null,
+          image_front: imageFront,
+          image_back: imageBack,
         },
       },
       {
@@ -81,45 +96,36 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">Edit Card</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Card Types - Multi-select */}
+          {/* Card Images - Dual Upload */}
           <div className="space-y-2">
-            <Label>Card Types (select multiple)</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {CARD_TYPES.map(({ value: type, label }) => {
-                const isSelected = cardTypes.includes(type);
-                return (
-                  <div
-                    key={type}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleTypeToggle(type)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleTypeToggle(type)}
-                    className={cn(
-                      'flex items-center gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer',
-                      isSelected
-                        ? 'bg-primary/20 ring-2 ring-primary'
-                        : 'bg-secondary/50 hover:bg-secondary'
-                    )}
-                  >
-                    <div className={cn(
-                      'w-4 h-4 rounded border-2 flex items-center justify-center',
-                      isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'
-                    )}>
-                      {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
-                    </div>
-                    <CardTypeIcon type={type} size="md" />
-                    <span className="text-sm font-medium">{label}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <Label>Card Images</Label>
+            <DualImageUpload
+              cardId={card.id}
+              frontImageUrl={imageFront}
+              backImageUrl={imageBack}
+              onFrontImageChange={setImageFront}
+              onBackImageChange={setImageBack}
+              immediateUpload
+            />
           </div>
+
+          {/* Card Labels - Searchable Tags */}
+          <CardLabelsInput
+            labels={cardLabels}
+            onChange={setCardLabels}
+          />
+
+          {/* Series / Set */}
+          <SeriesInput
+            value={series}
+            onChange={setSeries}
+          />
 
           {/* Brand Selection */}
           <div className="space-y-2">
@@ -168,6 +174,16 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
               />
             )}
           </div>
+
+          {/* Serial Numbering */}
+          <SerialNumberInput
+            isNumbered={isNumbered}
+            serialNum={serialNum}
+            serialTotal={serialTotal}
+            onIsNumberedChange={setIsNumbered}
+            onSerialNumChange={setSerialNum}
+            onSerialTotalChange={setSerialTotal}
+          />
 
           {/* Status Selection */}
           <div className="space-y-2">
@@ -250,7 +266,7 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={cardTypes.length === 0 || updateCard.isPending}
+            disabled={cardLabels.length === 0 || updateCard.isPending}
           >
             {updateCard.isPending ? 'Saving...' : 'Save Changes'}
           </Button>

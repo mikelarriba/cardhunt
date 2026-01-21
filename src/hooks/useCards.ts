@@ -17,6 +17,13 @@ export function useCards() {
       source_url?: string | null;
       notes?: string | null;
       brand?: string | null;
+      series?: string | null;
+      is_numbered?: boolean;
+      serial_num?: number | null;
+      serial_total?: number | null;
+      card_labels?: string[];
+      image_front?: string | null;
+      image_back?: string | null;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -64,6 +71,13 @@ export function useCards() {
         source_url: string | null;
         notes: string | null;
         brand: string | null;
+        series: string | null;
+        is_numbered: boolean;
+        serial_num: number | null;
+        serial_total: number | null;
+        card_labels: string[];
+        image_front: string | null;
+        image_back: string | null;
       }>;
     }) => {
       const { data, error } = await supabase

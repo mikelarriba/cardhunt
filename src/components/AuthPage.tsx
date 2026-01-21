@@ -53,7 +53,7 @@ export function AuthPage() {
             <Sparkles className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-3xl font-display font-bold text-gradient-gold mb-2">
-            Card Tracker
+            Card Hunt
           </h1>
           <p className="text-muted-foreground">
             {isSignUp ? 'Create your collection account' : 'Sign in to your collection'}
