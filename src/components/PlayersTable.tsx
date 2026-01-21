@@ -118,7 +118,7 @@ export function PlayersTable({ players }: PlayersTableProps) {
                 <TableCell>
                   <div className="flex items-center gap-1.5 flex-wrap max-w-[200px]">
                     {player.teams.slice(0, 3).map((team) => (
-                      <TeamLogo key={team} teamName={team} size="sm" />
+                      <TeamLogo key={team} teamName={team} sport={player.sport} size="sm" />
                     ))}
                     {player.teams.length > 3 && (
                       <span className="text-xs text-muted-foreground">

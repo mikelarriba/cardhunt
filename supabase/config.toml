@@ -2,3 +2,6 @@ project_id = "bwvwylqltmougniyfrcx"
 
 [functions.generate-player-image]
 verify_jwt = false
+
+[functions.get-team-logo]
+verify_jwt = false

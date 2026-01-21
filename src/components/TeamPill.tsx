@@ -1,13 +1,15 @@
 import { TeamLogo } from './TeamLogo';
+import { SportType } from '@/types/database';
 import { cn } from '@/lib/utils';
 
 interface TeamPillProps {
   teamName: string;
+  sport: SportType;
   showLogo?: boolean;
   size?: 'sm' | 'md';
 }
 
-export function TeamPill({ teamName, showLogo = true, size = 'sm' }: TeamPillProps) {
+export function TeamPill({ teamName, sport, showLogo = true, size = 'sm' }: TeamPillProps) {
   return (
     <div
       className={cn(
@@ -16,7 +18,7 @@ export function TeamPill({ teamName, showLogo = true, size = 'sm' }: TeamPillPro
         size === 'sm' ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
       )}
     >
-      {showLogo && <TeamLogo teamName={teamName} size="sm" />}
+      {showLogo && <TeamLogo teamName={teamName} sport={sport} size="sm" />}
       <span className="truncate max-w-[100px]">{teamName}</span>
     </div>
   );
@@ -24,18 +26,19 @@ export function TeamPill({ teamName, showLogo = true, size = 'sm' }: TeamPillPro
 
 interface TeamPillListProps {
   teams: string[];
+  sport: SportType;
   maxVisible?: number;
   size?: 'sm' | 'md';
 }
 
-export function TeamPillList({ teams, maxVisible = 3, size = 'sm' }: TeamPillListProps) {
+export function TeamPillList({ teams, sport, maxVisible = 3, size = 'sm' }: TeamPillListProps) {
   const visibleTeams = teams.slice(0, maxVisible);
   const remainingCount = teams.length - maxVisible;
 
   return (
     <div className="flex flex-wrap items-center gap-1">
       {visibleTeams.map((team) => (
-        <TeamPill key={team} teamName={team} size={size} />
+        <TeamPill key={team} teamName={team} sport={sport} size={size} />
       ))}
       {remainingCount > 0 && (
         <span className="text-[10px] text-muted-foreground px-1.5">

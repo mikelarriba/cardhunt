@@ -1,30 +1,23 @@
 import { useState } from 'react';
-import { TEAM_COLORS } from '@/types/database';
+import { TEAM_COLORS, SportType } from '@/types/database';
+import { useTeamLogo } from '@/hooks/useTeamLogo';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface TeamLogoProps {
   teamName: string;
+  sport: SportType;
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function TeamLogo({ teamName, size = 'md' }: TeamLogoProps) {
+export function TeamLogo({ teamName, sport, size = 'md' }: TeamLogoProps) {
   const [imageError, setImageError] = useState(false);
+  const { logoUrl, isLoading } = useTeamLogo(teamName, sport);
   
   const sizeClasses = {
     sm: 'w-5 h-5 text-[8px]',
     md: 'w-6 h-6 text-[10px]',
     lg: 'w-8 h-8 text-xs',
-  };
-
-  // Generate URL-friendly name for Clearbit
-  const getClearbitUrl = (name: string) => {
-    // Remove common suffixes and clean up the name
-    const cleaned = name
-      .toLowerCase()
-      .replace(/\s+(fc|sc|cf|united|city|town|rovers|wanderers|athletic|hotspur)$/i, '')
-      .replace(/\s+/g, '')
-      .replace(/[^a-z0-9]/g, '');
-    return `https://logo.clearbit.com/${cleaned}.com`;
   };
 
   // Get team initials for fallback
@@ -52,9 +45,18 @@ export function TeamLogo({ teamName, size = 'md' }: TeamLogoProps) {
 
   const initials = getInitials(teamName);
   const teamColor = getTeamColor(teamName);
-  const clearbitUrl = getClearbitUrl(teamName);
 
-  if (imageError) {
+  // Show skeleton while loading
+  if (isLoading) {
+    return (
+      <Skeleton 
+        className={cn('rounded-full shrink-0', sizeClasses[size])} 
+      />
+    );
+  }
+
+  // Show fallback initials if no logo or error
+  if (!logoUrl || imageError) {
     return (
       <div
         className={cn(
@@ -71,7 +73,7 @@ export function TeamLogo({ teamName, size = 'md' }: TeamLogoProps) {
 
   return (
     <img
-      src={clearbitUrl}
+      src={logoUrl}
       alt={teamName}
       className={cn('rounded-full object-cover shrink-0 bg-muted', sizeClasses[size])}
       onError={() => setImageError(true)}
