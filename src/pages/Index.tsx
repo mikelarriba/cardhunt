@@ -22,7 +22,7 @@ const Index = () => {
     return (
       <>
         <Helmet>
-          <title>Card Tracker - Your Collection, Quantified</title>
+          <title>Card Hunt - Your Collection, Quantified</title>
           <meta name="description" content="The all-in-one tracker for serious sports card collectors. Manage players, track values, and organize collections with a modern, flat interface." />
         </Helmet>
         <LandingPage />
@@ -34,7 +34,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Dashboard | Card Tracker</title>
+        <title>Dashboard | Card Hunt</title>
         <meta name="description" content="View and manage your sports card collection dashboard. Track players, filter by sport and team, and monitor your collection progress." />
       </Helmet>
       <Dashboard />

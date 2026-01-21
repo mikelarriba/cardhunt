@@ -1,6 +1,6 @@
 {
-  "name": "Card Tracker - Sports Card Collection Manager",
-  "short_name": "Card Tracker",
+  "name": "Card Hunt - Sports Card Collection Manager",
+  "short_name": "Card Hunt",
   "description": "Track and manage your sports card collection with ease. Organize players, monitor card status, and build your dream collection.",
   "start_url": "/",
   "display": "standalone",

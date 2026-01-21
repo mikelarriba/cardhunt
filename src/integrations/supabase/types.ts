@@ -17,14 +17,21 @@ export type Database = {
       cards: {
         Row: {
           brand: string | null
+          card_labels: string[] | null
           card_type: Database["public"]["Enums"]["card_type"]
           card_types: string[] | null
           created_at: string
           id: string
+          image_back: string | null
+          image_front: string | null
           image_url: string | null
+          is_numbered: boolean | null
           notes: string | null
           player_id: string
           price: number | null
+          serial_num: number | null
+          serial_total: number | null
+          series: string | null
           source_url: string | null
           status: Database["public"]["Enums"]["card_status"]
           updated_at: string
@@ -32,14 +39,21 @@ export type Database = {
         }
         Insert: {
           brand?: string | null
+          card_labels?: string[] | null
           card_type: Database["public"]["Enums"]["card_type"]
           card_types?: string[] | null
           created_at?: string
           id?: string
+          image_back?: string | null
+          image_front?: string | null
           image_url?: string | null
+          is_numbered?: boolean | null
           notes?: string | null
           player_id: string
           price?: number | null
+          serial_num?: number | null
+          serial_total?: number | null
+          series?: string | null
           source_url?: string | null
           status?: Database["public"]["Enums"]["card_status"]
           updated_at?: string
@@ -47,14 +61,21 @@ export type Database = {
         }
         Update: {
           brand?: string | null
+          card_labels?: string[] | null
           card_type?: Database["public"]["Enums"]["card_type"]
           card_types?: string[] | null
           created_at?: string
           id?: string
+          image_back?: string | null
+          image_front?: string | null
           image_url?: string | null
+          is_numbered?: boolean | null
           notes?: string | null
           player_id?: string
           price?: number | null
+          serial_num?: number | null
+          serial_total?: number | null
+          series?: string | null
           source_url?: string | null
           status?: Database["public"]["Enums"]["card_status"]
           updated_at?: string

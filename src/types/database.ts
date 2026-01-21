@@ -41,6 +41,14 @@ export interface Card {
   brand: string | null;
   created_at: string;
   updated_at: string;
+  // New fields for Card Hunt
+  is_numbered: boolean;
+  serial_num: number | null;
+  serial_total: number | null;
+  series: string | null;
+  card_labels: string[];
+  image_front: string | null;
+  image_back: string | null;
 }
 
 export interface PlayerWithCards extends Player {
@@ -61,6 +69,14 @@ export const SPORTS: { value: SportType; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
+// League logos mapping for major sports
+export const LEAGUE_LOGOS: Record<string, string> = {
+  basketball: 'https://cdn.ssref.net/req/202501091/tlogo/bbr/NBA-2025.png',
+  football: 'https://static.www.nfl.com/image/upload/v1554321393/league/nvfr7ogywskqrfaiu38m.svg',
+  baseball: 'https://www.mlbstatic.com/team-logos/league-on-dark/1.svg',
+  hockey: 'https://www-league.nhlstatic.com/images/logos/league-dark/133-flat.svg',
+};
+
 export const CARD_TYPES: { value: CardType; label: string }[] = [
   { value: 'rookie', label: 'Rookie' },
   { value: 'regular', label: 'Regular' },
@@ -78,6 +94,20 @@ export const CARD_BRANDS = [
   'Panini',
   'Upper Deck',
   'Topps',
+] as const;
+
+// Common series/sets
+export const CARD_SERIES = [
+  'Prizm',
+  'Mosaic',
+  'Donruss',
+  'Select',
+  'Optic',
+  'Contenders',
+  'Chronicles',
+  'National Treasures',
+  'Immaculate',
+  'Flawless',
 ] as const;
 
 export type CardBrand = typeof CARD_BRANDS[number] | string;

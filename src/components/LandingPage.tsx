@@ -262,7 +262,7 @@ export function LandingPage() {
             <div className="flex items-center gap-3">
               <Logo className="w-10 h-10" />
               <span className="font-display font-bold text-xl text-foreground">
-                Card Tracker
+                Card Hunt
               </span>
             </div>
             <ThemeToggle />
@@ -357,7 +357,7 @@ export function LandingPage() {
             </span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Card Tracker. All rights reserved.
+            © {new Date().getFullYear()} Card Hunt. All rights reserved.
           </p>
         </div>
       </footer>

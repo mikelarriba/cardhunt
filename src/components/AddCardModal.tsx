@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DollarSign, Link2, Check } from 'lucide-react';
+import { DollarSign, Link2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { CardType, CardStatus, Card, CARD_TYPES, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
-import { CardTypeIcon } from './CardTypeIcon';
+import { CardStatus, Card, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { useCards } from '@/hooks/useCards';
 import { cn } from '@/lib/utils';
+import { DualImageUpload } from './DualImageUpload';
+import { SerialNumberInput } from './SerialNumberInput';
+import { SeriesInput } from './SeriesInput';
+import { CardLabelsInput } from './CardLabelsInput';
 
 interface AddCardModalProps {
   open: boolean;
@@ -30,39 +33,65 @@ export function AddCardModal({
   playerName,
   existingCards,
 }: AddCardModalProps) {
-  const [cardTypes, setCardTypes] = useState<CardType[]>([]);
+  // Card labels (replacing fixed card types)
+  const [cardLabels, setCardLabels] = useState<string[]>([]);
   const [status, setStatus] = useState<CardStatus>('missing');
   const [price, setPrice] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
   const [notes, setNotes] = useState('');
   const [brand, setBrand] = useState('');
   const [customBrand, setCustomBrand] = useState('');
+  
+  // New fields
+  const [series, setSeries] = useState('');
+  const [isNumbered, setIsNumbered] = useState(false);
+  const [serialNum, setSerialNum] = useState('');
+  const [serialTotal, setSerialTotal] = useState('');
+  const [imageFront, setImageFront] = useState<string | null>(null);
+  const [imageBack, setImageBack] = useState<string | null>(null);
+
   const { createCard } = useCards();
 
-  const handleTypeToggle = (type: CardType) => {
-    if (cardTypes.includes(type)) {
-      setCardTypes(cardTypes.filter(t => t !== type));
-    } else {
-      setCardTypes([...cardTypes, type]);
-    }
-  };
+  // Get existing series from user's cards for suggestions
+  const existingSeries = Array.from(
+    new Set(existingCards.map(c => c.series).filter(Boolean) as string[])
+  );
+
+  // Get existing labels from user's cards for suggestions
+  const existingLabels = Array.from(
+    new Set(existingCards.flatMap(c => c.card_labels || []))
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (cardTypes.length === 0) return;
+    if (cardLabels.length === 0) return;
 
     const finalBrand = brand === 'custom' ? customBrand : brand;
+
+    // Determine primary card type for legacy support
+    const legacyType = cardLabels.includes('Rookie') ? 'rookie' 
+      : cardLabels.includes('Autographed') ? 'autographed'
+      : cardLabels.includes('Rated') ? 'rated'
+      : 'regular';
 
     createCard.mutate(
       {
         player_id: playerId,
-        card_type: cardTypes[0], // Primary type for legacy support
-        card_types: cardTypes,
+        card_type: legacyType,
+        card_types: [legacyType],
         status,
         price: price ? parseFloat(price) : null,
         source_url: sourceUrl || null,
         notes: notes || null,
         brand: finalBrand || null,
+        // New fields
+        series: series || null,
+        is_numbered: isNumbered,
+        serial_num: isNumbered && serialNum ? parseInt(serialNum) : null,
+        serial_total: isNumbered && serialTotal ? parseInt(serialTotal) : null,
+        card_labels: cardLabels,
+        image_front: imageFront,
+        image_back: imageBack,
       },
       {
         onSuccess: () => {
@@ -74,18 +103,24 @@ export function AddCardModal({
   };
 
   const resetForm = () => {
-    setCardTypes([]);
+    setCardLabels([]);
     setStatus('missing');
     setPrice('');
     setSourceUrl('');
     setNotes('');
     setBrand('');
     setCustomBrand('');
+    setSeries('');
+    setIsNumbered(false);
+    setSerialNum('');
+    setSerialTotal('');
+    setImageFront(null);
+    setImageBack(null);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
             Add Card for {playerName}
@@ -93,39 +128,30 @@ export function AddCardModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Card Type Selection - Multi-select */}
+          {/* Card Images - Dual Upload */}
           <div className="space-y-2">
-            <Label>Card Types (select multiple)</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {CARD_TYPES.map(({ value: type, label }) => {
-                const isSelected = cardTypes.includes(type);
-                return (
-                  <div
-                    key={type}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleTypeToggle(type)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleTypeToggle(type)}
-                    className={cn(
-                      'flex items-center gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer',
-                      isSelected
-                        ? 'bg-primary/20 ring-2 ring-primary'
-                        : 'bg-secondary/50 hover:bg-secondary'
-                    )}
-                  >
-                    <div className={cn(
-                      'w-4 h-4 rounded border-2 flex items-center justify-center',
-                      isSelected ? 'bg-primary border-primary' : 'border-muted-foreground'
-                    )}>
-                      {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
-                    </div>
-                    <CardTypeIcon type={type} size="md" />
-                    <span className="text-sm font-medium">{label}</span>
-                  </div>
-                );
-              })}
-            </div>
+            <Label>Card Images</Label>
+            <DualImageUpload
+              frontImageUrl={imageFront}
+              backImageUrl={imageBack}
+              onFrontImageChange={setImageFront}
+              onBackImageChange={setImageBack}
+            />
           </div>
+
+          {/* Card Labels - Searchable Tags */}
+          <CardLabelsInput
+            labels={cardLabels}
+            onChange={setCardLabels}
+            existingLabels={existingLabels}
+          />
+
+          {/* Series / Set */}
+          <SeriesInput
+            value={series}
+            onChange={setSeries}
+            existingSeries={existingSeries}
+          />
 
           {/* Brand Selection */}
           <div className="space-y-2">
@@ -168,6 +194,16 @@ export function AddCardModal({
               />
             )}
           </div>
+
+          {/* Serial Numbering */}
+          <SerialNumberInput
+            isNumbered={isNumbered}
+            serialNum={serialNum}
+            serialTotal={serialTotal}
+            onIsNumberedChange={setIsNumbered}
+            onSerialNumChange={setSerialNum}
+            onSerialTotalChange={setSerialTotal}
+          />
 
           {/* Status Selection */}
           <div className="space-y-2">
@@ -250,7 +286,7 @@ export function AddCardModal({
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={cardTypes.length === 0 || createCard.isPending}
+            disabled={cardLabels.length === 0 || createCard.isPending}
           >
             {createCard.isPending ? 'Adding...' : 'Add Card'}
           </Button>
