@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '@/hooks/useAuth';
 import { AuthPage } from '@/components/AuthPage';
 import { Dashboard } from '@/components/Dashboard';
@@ -17,10 +18,26 @@ const Index = () => {
   }
 
   if (!user) {
-    return <AuthPage />;
+    return (
+      <>
+        <Helmet>
+          <title>Card Tracker - Sign In to Manage Your Collection</title>
+          <meta name="description" content="Sign in to Card Tracker to start managing your sports card collection. Track players, organize by sport and team, and monitor your collection progress." />
+        </Helmet>
+        <AuthPage />
+      </>
+    );
   }
 
-  return <Dashboard />;
+  return (
+    <>
+      <Helmet>
+        <title>Dashboard | Card Tracker</title>
+        <meta name="description" content="View and manage your sports card collection dashboard. Track players, filter by sport and team, and monitor your collection progress." />
+      </Helmet>
+      <Dashboard />
+    </>
+  );
 };
 
 export default Index;
