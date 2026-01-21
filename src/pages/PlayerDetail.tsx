@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Plus, Pencil } from 'lucide-react';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +31,9 @@ export default function PlayerDetail() {
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-background p-6">
+        <Helmet>
+          <title>Loading... | Card Tracker</title>
+        </Helmet>
         <div className="max-w-4xl mx-auto space-y-6">
           <Skeleton className="h-10 w-32" />
           <Skeleton className="h-24 w-full" />
@@ -42,6 +46,10 @@ export default function PlayerDetail() {
   if (error || !player) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+        <Helmet>
+          <title>Player Not Found | Card Tracker</title>
+          <meta name="robots" content="noindex" />
+        </Helmet>
         <div className="text-center">
           <h1 className="text-2xl font-display font-bold text-foreground mb-2">
             Player Not Found
@@ -58,8 +66,21 @@ export default function PlayerDetail() {
     );
   }
 
+  const ownedCount = player.cards.filter(c => c.status === 'owned').length;
+  const totalCount = player.cards.length;
+  const teamsText = player.teams.length > 0 ? player.teams.slice(0, 2).join(', ') : '';
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{player.name} Cards | Card Tracker</title>
+        <meta 
+          name="description" 
+          content={`View ${player.name}'s ${player.sport} card collection. ${ownedCount} of ${totalCount} cards owned.${teamsText ? ` Teams: ${teamsText}.` : ''} Track and manage your collection.`} 
+        />
+        <meta name="robots" content="noindex" />
+      </Helmet>
+
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
         <div className="max-w-4xl mx-auto px-6 py-4">
