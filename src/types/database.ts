@@ -55,6 +55,32 @@ export interface Card {
   seller: string | null;
 }
 
+export interface Seller {
+  id: string;
+  user_id: string;
+  name: string;
+  url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BuyOption {
+  id: string;
+  card_id: string;
+  seller_id: string | null;
+  source_url: string | null;
+  price: number | null;
+  shipping_cost: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  seller?: Seller | null;
+}
+
+export interface CardWithBuyOptions extends Card {
+  buy_options?: BuyOption[];
+}
+
 export interface PlayerWithCards extends Player {
   cards: Card[];
   tags?: Tag[];

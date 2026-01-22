@@ -3,13 +3,12 @@ import { Card, SportType, LEAGUE_LOGOS } from '@/types/database';
 import { StatusBadge } from './StatusBadge';
 import { BestValueBadge } from './BestValueBadge';
 import { BrandBadge } from './BrandBadge';
-import { EditCardModal } from './EditCardModal';
+import { CardDetailModal } from './CardDetailModal';
 import { SerialNumberBadge } from './SerialNumberInput';
 import { LeagueLogo } from './LeagueLogo';
 import { Button } from '@/components/ui/button';
-import { Trash2, ExternalLink, DollarSign, FileText, Pencil, ImageIcon, RotateCcw } from 'lucide-react';
+import { Trash2, ExternalLink, DollarSign, FileText, ImageIcon, RotateCcw } from 'lucide-react';
 import { useCards } from '@/hooks/useCards';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   Carousel,
   CarouselContent,
@@ -68,8 +67,7 @@ function getBestValueCardIds(cards: Card[]): Set<string> {
 
 export function CardCarousel({ cards, sport }: CardCarouselProps) {
   const { deleteCard } = useCards();
-  const queryClient = useQueryClient();
-  const [editingCard, setEditingCard] = useState<Card | null>(null);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 
   const bestValueIds = useMemo(() => getBestValueCardIds(cards), [cards]);
 
@@ -108,7 +106,7 @@ export function CardCarousel({ cards, sport }: CardCarouselProps) {
                   displayLabels={displayLabels}
                   isBestValue={isBestValue}
                   sport={sport}
-                  onEdit={() => setEditingCard(card)}
+                  onClick={() => setSelectedCard(card)}
                   onDelete={() => deleteCard.mutate(card.id)}
                 />
               </CarouselItem>
@@ -119,11 +117,12 @@ export function CardCarousel({ cards, sport }: CardCarouselProps) {
         <CarouselNext className="-right-4 md:-right-6" />
       </Carousel>
 
-      {editingCard && (
-        <EditCardModal
-          open={!!editingCard}
-          onOpenChange={(open) => !open && setEditingCard(null)}
-          card={editingCard}
+      {selectedCard && (
+        <CardDetailModal
+          open={!!selectedCard}
+          onOpenChange={(open) => !open && setSelectedCard(null)}
+          card={selectedCard}
+          sport={sport}
         />
       )}
     </>
@@ -137,7 +136,7 @@ function CardDisplay({
   displayLabels,
   isBestValue,
   sport,
-  onEdit,
+  onClick,
   onDelete,
 }: {
   card: Card;
@@ -146,14 +145,14 @@ function CardDisplay({
   displayLabels: string[];
   isBestValue: boolean;
   sport?: SportType;
-  onEdit: () => void;
+  onClick: () => void;
   onDelete: () => void;
 }) {
   const [showBack, setShowBack] = useState(false);
   const currentImage = showBack && card.image_back ? card.image_back : cardImage;
 
   return (
-    <div className="glass-card p-4 relative">
+    <div className="glass-card p-4 relative cursor-pointer hover:ring-2 hover:ring-primary/50 transition-all" onClick={onClick}>
       {/* Best Value Badge */}
       {isBestValue && <BestValueBadge />}
       
@@ -242,16 +241,7 @@ function CardDisplay({
             <StatusBadge status={card.status} size="md" />
           </div>
           
-          <div className="flex gap-1">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-muted-foreground hover:text-foreground"
-              onClick={onEdit}
-            >
-              <Pencil className="w-5 h-5" />
-            </Button>
-            
+          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10">
