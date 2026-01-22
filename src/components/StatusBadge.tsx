@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface StatusBadgeProps {
   status: CardStatus;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 const statusConfig = {
@@ -34,10 +34,11 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
       className={cn(
         'status-badge',
         config.className,
-        size === 'sm' && 'text-[10px] px-2 py-0.5'
+        size === 'sm' && 'text-[10px] px-2 py-0.5',
+        size === 'lg' && 'text-base px-4 py-1.5'
       )}
     >
-      <Icon className={cn('w-3 h-3', size === 'sm' && 'w-2.5 h-2.5')} />
+      <Icon className={cn('w-3 h-3', size === 'sm' && 'w-2.5 h-2.5', size === 'lg' && 'w-4 h-4')} />
       {config.label}
     </span>
   );

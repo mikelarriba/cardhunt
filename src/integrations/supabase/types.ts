@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      buy_options: {
+        Row: {
+          card_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          price: number | null
+          seller_id: string | null
+          shipping_cost: number | null
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          price?: number | null
+          seller_id?: string | null
+          shipping_cost?: number | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          price?: number | null
+          seller_id?: string | null
+          shipping_cost?: number | null
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buy_options_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buy_options_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "sellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cards: {
         Row: {
           brand: string | null
@@ -162,6 +213,33 @@ export type Database = {
           sport?: Database["public"]["Enums"]["sport_type"]
           teams?: string[]
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sellers: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: []
