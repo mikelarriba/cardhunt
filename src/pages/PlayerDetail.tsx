@@ -10,8 +10,10 @@ import { AddCardModal } from '@/components/AddCardModal';
 import { EditPlayerModal } from '@/components/EditPlayerModal';
 import { TeamPillList } from '@/components/TeamPill';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LiveMarketSection } from '@/components/LiveMarketSection';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useState, useEffect } from 'react';
 
 export default function PlayerDetail() {
@@ -125,8 +127,8 @@ export default function PlayerDetail() {
         </div>
       </header>
 
-      {/* Progress Summary */}
-      <div className="max-w-4xl mx-auto px-6 py-6">
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-6 py-6">
         <div className="glass-card p-4 mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -143,8 +145,27 @@ export default function PlayerDetail() {
           </div>
         </div>
 
-        {/* Card Carousel */}
-        <CardCarousel cards={player.cards} />
+        {/* Tabs for Cards and Live Market */}
+        <Tabs defaultValue="cards" className="space-y-6">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="cards">My Cards</TabsTrigger>
+            <TabsTrigger value="market">Live Market</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="cards" className="space-y-4">
+            <CardCarousel cards={player.cards} sport={player.sport} />
+          </TabsContent>
+
+          <TabsContent value="market">
+            <div className="glass-card p-6">
+              <LiveMarketSection
+                playerName={player.name}
+                playerTeams={player.teams}
+                card={player.cards[0]}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <AddCardModal

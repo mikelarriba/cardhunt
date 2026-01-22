@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Link2 } from 'lucide-react';
+import { DollarSign, Link2, Calendar, Users, Store } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -41,6 +41,11 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
   const [serialTotal, setSerialTotal] = useState(card.serial_total?.toString() || '');
   const [imageFront, setImageFront] = useState<string | null>(card.image_front || card.image_url);
   const [imageBack, setImageBack] = useState<string | null>(card.image_back || null);
+  
+  // eBay integration fields
+  const [cardYear, setCardYear] = useState((card as any).card_year?.toString() || '');
+  const [cardTeam, setCardTeam] = useState((card as any).card_team || '');
+  const [seller, setSeller] = useState((card as any).seller || '');
 
   const { updateCard } = useCards();
 
@@ -59,6 +64,9 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
       setSerialTotal(card.serial_total?.toString() || '');
       setImageFront(card.image_front || card.image_url);
       setImageBack(card.image_back || null);
+      setCardYear((card as any).card_year?.toString() || '');
+      setCardTeam((card as any).card_team || '');
+      setSeller((card as any).seller || '');
     }
   }, [open, card]);
 
@@ -84,6 +92,9 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
           serial_total: isNumbered && serialTotal ? parseInt(serialTotal) : null,
           image_front: imageFront,
           image_back: imageBack,
+          card_year: cardYear ? parseInt(cardYear) : null,
+          card_team: cardTeam || null,
+          seller: seller || null,
         },
       },
       {
@@ -184,6 +195,52 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
             onSerialNumChange={setSerialNum}
             onSerialTotalChange={setSerialTotal}
           />
+
+          {/* Year, Team, Seller - Row */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="cardYear" className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                Year
+              </Label>
+              <Input
+                id="cardYear"
+                type="number"
+                min="1900"
+                max={new Date().getFullYear() + 1}
+                placeholder="2024"
+                value={cardYear}
+                onChange={(e) => setCardYear(e.target.value)}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cardTeam" className="flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                Team
+              </Label>
+              <Input
+                id="cardTeam"
+                placeholder="Lakers"
+                value={cardTeam}
+                onChange={(e) => setCardTeam(e.target.value)}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="seller" className="flex items-center gap-1">
+                <Store className="w-3 h-3" />
+                Seller
+              </Label>
+              <Input
+                id="seller"
+                placeholder="eBay seller"
+                value={seller}
+                onChange={(e) => setSeller(e.target.value)}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+          </div>
 
           {/* Status Selection */}
           <div className="space-y-2">

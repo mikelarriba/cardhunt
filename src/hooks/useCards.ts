@@ -24,6 +24,9 @@ export function useCards() {
       card_labels?: string[];
       image_front?: string | null;
       image_back?: string | null;
+      card_year?: number | null;
+      card_team?: string | null;
+      seller?: string | null;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
@@ -78,6 +81,9 @@ export function useCards() {
         card_labels: string[];
         image_front: string | null;
         image_back: string | null;
+        card_year: number | null;
+        card_team: string | null;
+        seller: string | null;
       }>;
     }) => {
       const { data, error } = await supabase

@@ -49,6 +49,10 @@ export interface Card {
   card_labels: string[];
   image_front: string | null;
   image_back: string | null;
+  // eBay integration fields
+  card_year: number | null;
+  card_team: string | null;
+  seller: string | null;
 }
 
 export interface PlayerWithCards extends Player {

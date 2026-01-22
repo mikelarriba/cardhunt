@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.get-team-logo]
 verify_jwt = false
+
+[functions.search-ebay]
+verify_jwt = false

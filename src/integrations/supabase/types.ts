@@ -18,8 +18,10 @@ export type Database = {
         Row: {
           brand: string | null
           card_labels: string[] | null
+          card_team: string | null
           card_type: Database["public"]["Enums"]["card_type"]
           card_types: string[] | null
+          card_year: number | null
           created_at: string
           id: string
           image_back: string | null
@@ -29,6 +31,7 @@ export type Database = {
           notes: string | null
           player_id: string
           price: number | null
+          seller: string | null
           serial_num: number | null
           serial_total: number | null
           series: string | null
@@ -40,8 +43,10 @@ export type Database = {
         Insert: {
           brand?: string | null
           card_labels?: string[] | null
+          card_team?: string | null
           card_type: Database["public"]["Enums"]["card_type"]
           card_types?: string[] | null
+          card_year?: number | null
           created_at?: string
           id?: string
           image_back?: string | null
@@ -51,6 +56,7 @@ export type Database = {
           notes?: string | null
           player_id: string
           price?: number | null
+          seller?: string | null
           serial_num?: number | null
           serial_total?: number | null
           series?: string | null
@@ -62,8 +68,10 @@ export type Database = {
         Update: {
           brand?: string | null
           card_labels?: string[] | null
+          card_team?: string | null
           card_type?: Database["public"]["Enums"]["card_type"]
           card_types?: string[] | null
+          card_year?: number | null
           created_at?: string
           id?: string
           image_back?: string | null
@@ -73,6 +81,7 @@ export type Database = {
           notes?: string | null
           player_id?: string
           price?: number | null
+          seller?: string | null
           serial_num?: number | null
           serial_total?: number | null
           series?: string | null
