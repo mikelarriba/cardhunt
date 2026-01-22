@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DollarSign, Link2 } from 'lucide-react';
+import { DollarSign, Link2, Calendar, Users, Store } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -49,6 +49,11 @@ export function AddCardModal({
   const [serialTotal, setSerialTotal] = useState('');
   const [imageFront, setImageFront] = useState<string | null>(null);
   const [imageBack, setImageBack] = useState<string | null>(null);
+  
+  // eBay integration fields
+  const [cardYear, setCardYear] = useState('');
+  const [cardTeam, setCardTeam] = useState('');
+  const [seller, setSeller] = useState('');
 
   const { createCard } = useCards();
 
@@ -92,6 +97,10 @@ export function AddCardModal({
         card_labels: cardLabels,
         image_front: imageFront,
         image_back: imageBack,
+        // eBay integration fields
+        card_year: cardYear ? parseInt(cardYear) : null,
+        card_team: cardTeam || null,
+        seller: seller || null,
       },
       {
         onSuccess: () => {
@@ -116,6 +125,9 @@ export function AddCardModal({
     setSerialTotal('');
     setImageFront(null);
     setImageBack(null);
+    setCardYear('');
+    setCardTeam('');
+    setSeller('');
   };
 
   return (
@@ -204,6 +216,52 @@ export function AddCardModal({
             onSerialNumChange={setSerialNum}
             onSerialTotalChange={setSerialTotal}
           />
+
+          {/* Year, Team, Seller - Row */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="cardYear" className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                Year
+              </Label>
+              <Input
+                id="cardYear"
+                type="number"
+                min="1900"
+                max={new Date().getFullYear() + 1}
+                placeholder="2024"
+                value={cardYear}
+                onChange={(e) => setCardYear(e.target.value)}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cardTeam" className="flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                Team
+              </Label>
+              <Input
+                id="cardTeam"
+                placeholder="Lakers"
+                value={cardTeam}
+                onChange={(e) => setCardTeam(e.target.value)}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="seller" className="flex items-center gap-1">
+                <Store className="w-3 h-3" />
+                Seller
+              </Label>
+              <Input
+                id="seller"
+                placeholder="eBay seller"
+                value={seller}
+                onChange={(e) => setSeller(e.target.value)}
+                className="bg-secondary/50 border-border/50"
+              />
+            </div>
+          </div>
 
           {/* Status Selection */}
           <div className="space-y-2">

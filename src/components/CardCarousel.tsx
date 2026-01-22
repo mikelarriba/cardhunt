@@ -85,8 +85,14 @@ export function CardCarousel({ cards, sport }: CardCarouselProps) {
 
   return (
     <>
-      <Carousel className="w-full max-w-md mx-auto">
-        <CarouselContent>
+      <Carousel 
+        className="w-full"
+        opts={{
+          align: 'start',
+          loop: false,
+        }}
+      >
+        <CarouselContent className="-ml-2 md:-ml-4">
           {cards.map((card) => {
             const isBestValue = bestValueIds.has(card.id);
             const displayLabels = card.card_labels?.length ? card.card_labels : [];
@@ -94,7 +100,7 @@ export function CardCarousel({ cards, sport }: CardCarouselProps) {
             const hasBackImage = !!card.image_back;
             
             return (
-              <CarouselItem key={card.id}>
+              <CarouselItem key={card.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
                 <CardDisplay
                   card={card}
                   cardImage={cardImage}
@@ -109,8 +115,8 @@ export function CardCarousel({ cards, sport }: CardCarouselProps) {
             );
           })}
         </CarouselContent>
-        <CarouselPrevious className="left-0" />
-        <CarouselNext className="right-0" />
+        <CarouselPrevious className="-left-4 md:-left-6" />
+        <CarouselNext className="-right-4 md:-right-6" />
       </Carousel>
 
       {editingCard && (
@@ -147,12 +153,12 @@ function CardDisplay({
   const currentImage = showBack && card.image_back ? card.image_back : cardImage;
 
   return (
-    <div className="glass-card p-4 mx-2 relative">
+    <div className="glass-card p-4 relative">
       {/* Best Value Badge */}
       {isBestValue && <BestValueBadge />}
       
       {/* Card Image - Vertical 2:3 aspect ratio */}
-      <div className="max-w-[280px] mx-auto relative">
+      <div className="relative">
         {/* Brand Badge - Top Left */}
         <BrandBadge brand={card.brand} />
         
