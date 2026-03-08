@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoreVertical, Plus, Trash2, Eye, ImageIcon } from 'lucide-react';
-import { PlayerWithCards, CardType, CARD_TYPES } from '@/types/database';
-import { CardTypeIcon } from './CardTypeIcon';
+import { MoreVertical, Plus, Trash2, Eye } from 'lucide-react';
+import { PlayerWithCards } from '@/types/database';
 import { SportBadge } from './SportBadge';
 import { ProgressDots } from './ProgressDots';
 import { AddCardModal } from './AddCardModal';
