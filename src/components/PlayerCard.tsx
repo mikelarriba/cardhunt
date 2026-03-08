@@ -139,21 +139,9 @@ export function PlayerCard({ player }: PlayerCardProps) {
               <TeamPillList teams={player.teams} sport={player.sport} maxVisible={2} />
             </div>
 
-            {/* Card Type Icons */}
+            {/* Card count and progress */}
             <div className="flex items-center justify-between">
-              <div className="flex gap-1">
-                {CARD_TYPES.map(({ value: type }) => {
-                  const card = getCardByType(type);
-                  return (
-                    <CardTypeIcon
-                      key={type}
-                      type={type}
-                      status={card?.status}
-                      size="sm"
-                    />
-                  );
-                })}
-              </div>
+              <span className="text-xs text-white/70">{player.cards.length} card{player.cards.length !== 1 ? 's' : ''}</span>
               <ProgressDots cards={player.cards} />
             </div>
           </div>

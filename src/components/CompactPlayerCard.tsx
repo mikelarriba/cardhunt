@@ -39,9 +39,9 @@ export function CompactPlayerCard({ player }: CompactPlayerCardProps) {
     missing: '',
   }[playerStatus];
 
-  // Get a sample card image if available
-  const cardWithImage = player.cards.find(c => c.image_url);
-  const displayImage = cardWithImage?.image_url || getPlaceholderImageUrl(player.name);
+  // Get a sample card image if available (prefer image_front, fallback to image_url)
+  const cardWithImage = player.cards.find(c => c.image_front || c.image_url);
+  const displayImage = cardWithImage?.image_front || cardWithImage?.image_url || getPlaceholderImageUrl(player.name);
 
   // Count cards by status
   const ownedCount = player.cards.filter(c => c.status === 'owned').length;

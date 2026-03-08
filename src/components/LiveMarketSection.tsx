@@ -47,7 +47,7 @@ export function LiveMarketSection({
       player: playerName,
       team: playerTeams[0],
       series: card?.series || undefined,
-      year: (card as any)?.card_year || undefined,
+      year: card?.card_year || undefined,
     });
   };
 

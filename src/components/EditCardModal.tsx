@@ -64,9 +64,9 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
       setSerialTotal(card.serial_total?.toString() || '');
       setImageFront(card.image_front || card.image_url);
       setImageBack(card.image_back || null);
-      setCardYear((card as any).card_year?.toString() || '');
-      setCardTeam((card as any).card_team || '');
-      setSeller((card as any).seller || '');
+      setCardYear(card.card_year?.toString() || '');
+      setCardTeam(card.card_team || '');
+      setSeller(card.seller || '');
     }
   }, [open, card]);
 
