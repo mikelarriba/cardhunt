@@ -42,10 +42,6 @@ export function PlayerCard({ player }: PlayerCardProps) {
   const { deletePlayer } = usePlayers();
   const navigate = useNavigate();
 
-  const getCardByType = (type: CardType) => {
-    return player.cards.find((c) => c.card_type === type);
-  };
-
   const playerStatus = getPlayerStatus(player);
   
   // Get status color classes
