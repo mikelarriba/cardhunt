@@ -10,48 +10,33 @@ export function usePlayers() {
   const playersQuery = useQuery({
     queryKey: ['players'],
     queryFn: async (): Promise<PlayerWithCards[]> => {
+      // Single query with joined cards via foreign key
       const { data: players, error: playersError } = await supabase
         .from('players')
-        .select('*')
+        .select(`
+          *,
+          cards (*),
+          player_tags (
+            tag_id,
+            tags:tag_id (id, user_id, name, created_at)
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (playersError) throw playersError;
 
-      const { data: cards, error: cardsError } = await supabase
-        .from('cards')
-        .select('*');
-
-      if (cardsError) throw cardsError;
-
-      // Fetch player tags with tag details
-      const { data: playerTags, error: playerTagsError } = await supabase
-        .from('player_tags')
-        .select('player_id, tag_id, tags:tag_id(id, user_id, name, created_at)');
-
-      if (playerTagsError) throw playerTagsError;
-
-      // Group tags by player
-      const tagsByPlayer: Record<string, Tag[]> = {};
-      (playerTags || []).forEach((pt: any) => {
-        if (pt.tags) {
-          if (!tagsByPlayer[pt.player_id]) {
-            tagsByPlayer[pt.player_id] = [];
-          }
-          tagsByPlayer[pt.player_id].push(pt.tags as Tag);
-        }
-      });
-
-      return (players || []).map((player) => ({
+      return (players || []).map((player: any) => ({
         ...player,
         sport: player.sport as SportType,
         teams: player.teams || [],
-        cards: (cards || [])
-          .filter((card) => card.player_id === player.id)
-          .map((card) => ({
-            ...card,
-            card_types: (card.card_types || []) as CardType[],
-          })),
-        tags: tagsByPlayer[player.id] || [],
+        cards: (player.cards || []).map((card: any) => ({
+          ...card,
+          card_types: (card.card_types || []) as CardType[],
+        })),
+        tags: (player.player_tags || [])
+          .map((pt: any) => pt.tags)
+          .filter(Boolean) as Tag[],
+        player_tags: undefined,
       }));
     },
   });
@@ -77,17 +62,10 @@ export function usePlayers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
-      toast({
-        title: 'Player Added',
-        description: 'The player has been added to your collection.',
-      });
+      toast({ title: 'Player Added', description: 'The player has been added to your collection.' });
     },
     onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -97,11 +75,7 @@ export function usePlayers() {
       updates,
     }: {
       playerId: string;
-      updates: Partial<{
-        name: string;
-        sport: SportType;
-        teams: string[];
-      }>;
+      updates: Partial<{ name: string; sport: SportType; teams: string[] }>;
     }) => {
       const { data, error } = await supabase
         .from('players')
@@ -116,42 +90,24 @@ export function usePlayers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
       queryClient.invalidateQueries({ queryKey: ['player'] });
-      toast({
-        title: 'Player Updated',
-        description: 'The player has been updated.',
-      });
+      toast({ title: 'Player Updated', description: 'The player has been updated.' });
     },
     onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
   const deletePlayer = useMutation({
     mutationFn: async (playerId: string) => {
-      const { error } = await supabase
-        .from('players')
-        .delete()
-        .eq('id', playerId);
-
+      const { error } = await supabase.from('players').delete().eq('id', playerId);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
-      toast({
-        title: 'Player Deleted',
-        description: 'The player has been removed from your collection.',
-      });
+      toast({ title: 'Player Deleted', description: 'The player has been removed from your collection.' });
     },
     onError: (error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MoreVertical, Plus, Trash2, Eye, ImageIcon } from 'lucide-react';
-import { PlayerWithCards, CardType, CARD_TYPES } from '@/types/database';
-import { CardTypeIcon } from './CardTypeIcon';
+import { MoreVertical, Plus, Trash2, Eye } from 'lucide-react';
+import { PlayerWithCards } from '@/types/database';
 import { SportBadge } from './SportBadge';
 import { ProgressDots } from './ProgressDots';
 import { AddCardModal } from './AddCardModal';
@@ -43,10 +42,6 @@ export function PlayerCard({ player }: PlayerCardProps) {
   const { deletePlayer } = usePlayers();
   const navigate = useNavigate();
 
-  const getCardByType = (type: CardType) => {
-    return player.cards.find((c) => c.card_type === type);
-  };
-
   const playerStatus = getPlayerStatus(player);
   
   // Get status color classes
@@ -62,9 +57,9 @@ export function PlayerCard({ player }: PlayerCardProps) {
     missing: '',
   }[playerStatus];
 
-  // Get a sample card image if available
-  const cardWithImage = player.cards.find(c => c.image_url);
-  const displayImage = cardWithImage?.image_url || getPlaceholderImageUrl(player.name);
+  // Get a sample card image if available (prefer image_front, fallback to image_url)
+  const cardWithImage = player.cards.find(c => c.image_front || c.image_url);
+  const displayImage = cardWithImage?.image_front || cardWithImage?.image_url || getPlaceholderImageUrl(player.name);
 
   return (
     <>
@@ -144,21 +139,9 @@ export function PlayerCard({ player }: PlayerCardProps) {
               <TeamPillList teams={player.teams} sport={player.sport} maxVisible={2} />
             </div>
 
-            {/* Card Type Icons */}
+            {/* Card count and progress */}
             <div className="flex items-center justify-between">
-              <div className="flex gap-1">
-                {CARD_TYPES.map(({ value: type }) => {
-                  const card = getCardByType(type);
-                  return (
-                    <CardTypeIcon
-                      key={type}
-                      type={type}
-                      status={card?.status}
-                      size="sm"
-                    />
-                  );
-                })}
-              </div>
+              <span className="text-xs text-white/70">{player.cards.length} card{player.cards.length !== 1 ? 's' : ''}</span>
               <ProgressDots cards={player.cards} />
             </div>
           </div>

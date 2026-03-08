@@ -102,8 +102,10 @@ export function PlayersTable({ players }: PlayersTableProps) {
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-muted flex-shrink-0">
                       <img
                         src={
-                          player.cards.find(c => c.image_url)?.image_url ||
-                          `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=1a1a2e&textColor=fbbf24`
+                          (() => {
+                            const c = player.cards.find(c => c.image_front || c.image_url);
+                            return c?.image_front || c?.image_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(player.name)}&backgroundColor=1a1a2e&textColor=fbbf24`;
+                          })()
                         }
                         alt={player.name}
                         className="w-full h-full object-cover"
