@@ -43,9 +43,9 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
   const [imageBack, setImageBack] = useState<string | null>(card.image_back || null);
   
   // eBay integration fields
-  const [cardYear, setCardYear] = useState((card as any).card_year?.toString() || '');
-  const [cardTeam, setCardTeam] = useState((card as any).card_team || '');
-  const [seller, setSeller] = useState((card as any).seller || '');
+  const [cardYear, setCardYear] = useState(card.card_year?.toString() || '');
+  const [cardTeam, setCardTeam] = useState(card.card_team || '');
+  const [seller, setSeller] = useState(card.seller || '');
 
   const { updateCard } = useCards();
 
