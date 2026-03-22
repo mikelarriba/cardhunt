@@ -275,18 +275,8 @@ export function Dashboard() {
           </div>
         ) : viewMode === 'table' ? (
           <PlayersTable players={filteredPlayers} />
-        ) : viewMode === 'compact' ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {filteredPlayers.map((player) => (
-              <CompactPlayerCard key={player.id} player={player} />
-            ))}
-          </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredPlayers.map((player) => (
-              <PlayerCard key={player.id} player={player} />
-            ))}
-          </div>
+          <VirtualPlayerGrid players={filteredPlayers} viewMode={viewMode === 'compact' ? 'compact' : 'grid'} />
         )}
       </main>
 
