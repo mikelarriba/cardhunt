@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Plus, LogOut, Sparkles, LayoutGrid, SearchX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
+import { VirtualPlayerGrid } from './VirtualPlayerGrid';
 import { CompactPlayerCard } from './CompactPlayerCard';
 import { PlayersTable } from './PlayersTable';
 import { AddPlayerModal } from './AddPlayerModal';
