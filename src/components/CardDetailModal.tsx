@@ -43,7 +43,6 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
   const hasBackImage = !!card.image_back;
   const currentImage = showBack && card.image_back ? card.image_back : cardImage;
   const displayLabels = card.card_labels?.length ? card.card_labels : [];
-  const displayLabels = card.card_labels?.length ? card.card_labels : [];
 
   return (
     <>
