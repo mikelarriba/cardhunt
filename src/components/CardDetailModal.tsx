@@ -192,14 +192,31 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
                     </div>
                   )}
 
-                  {card.price !== null && (
+                  {derivedPrice !== null && (
                     <div className="flex items-start gap-3">
                       <DollarSign className="w-5 h-5 text-primary mt-0.5" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Price</p>
+                        <p className="text-sm text-muted-foreground">Best Price (incl. shipping)</p>
                         <p className="font-display font-bold text-xl text-primary">
-                          ${card.price.toFixed(2)}
+                          ${derivedPrice.toFixed(2)}
                         </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {derivedSourceUrl && (
+                    <div className="flex items-start gap-3">
+                      <Link2 className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Source</p>
+                        <a
+                          href={derivedSourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-sm break-all"
+                        >
+                          {derivedSourceUrl}
+                        </a>
                       </div>
                     </div>
                   )}
