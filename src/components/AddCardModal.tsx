@@ -112,8 +112,6 @@ export function AddCardModal({
   const resetForm = () => {
     setCardLabels([]);
     setStatus('missing');
-    setPrice('');
-    setSourceUrl('');
     setNotes('');
     setBrand('');
     setCustomBrand('');
