@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Pencil, X, ImageIcon, RotateCcw, DollarSign, Calendar, Building2, Tag, FileText } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Pencil, X, ImageIcon, RotateCcw, DollarSign, Calendar, Building2, Tag, FileText, Link2 } from 'lucide-react';
 import { Card, SportType, LEAGUE_LOGOS } from '@/types/database';
 import { StatusBadge } from './StatusBadge';
 import { BrandBadge } from './BrandBadge';
@@ -7,6 +7,7 @@ import { SerialNumberBadge } from './SerialNumberInput';
 import { LeagueLogo } from './LeagueLogo';
 import { BuyOptionsTable } from './BuyOptionsTable';
 import { EditCardModal } from './EditCardModal';
+import { useBuyOptions } from '@/hooks/useBuyOptions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
