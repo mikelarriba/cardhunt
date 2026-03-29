@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DollarSign, Link2, Calendar, Users, Store } from 'lucide-react';
+import { Calendar, Users, Store } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -36,8 +36,6 @@ export function AddCardModal({
   // Card labels (replacing fixed card types)
   const [cardLabels, setCardLabels] = useState<string[]>([]);
   const [status, setStatus] = useState<CardStatus>('missing');
-  const [price, setPrice] = useState('');
-  const [sourceUrl, setSourceUrl] = useState('');
   const [notes, setNotes] = useState('');
   const [brand, setBrand] = useState('');
   const [customBrand, setCustomBrand] = useState('');
@@ -85,8 +83,8 @@ export function AddCardModal({
         card_type: legacyType,
         card_types: [legacyType],
         status,
-        price: price ? parseFloat(price) : null,
-        source_url: sourceUrl || null,
+        price: null,
+        source_url: null,
         notes: notes || null,
         brand: finalBrand || null,
         // New fields
@@ -114,8 +112,6 @@ export function AddCardModal({
   const resetForm = () => {
     setCardLabels([]);
     setStatus('missing');
-    setPrice('');
-    setSourceUrl('');
     setNotes('');
     setBrand('');
     setCustomBrand('');
@@ -289,43 +285,6 @@ export function AddCardModal({
             </div>
           </div>
 
-          {/* Price */}
-          <div className="space-y-2">
-            <Label htmlFor="price">
-              {status === 'owned' ? 'Paid Price' : 'Price to Pay'}
-            </Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="pl-10 bg-secondary/50 border-border/50"
-              />
-            </div>
-          </div>
-
-          {/* Source URL */}
-          {status !== 'owned' && (
-            <div className="space-y-2 animate-fade-in">
-              <Label htmlFor="sourceUrl">Source URL</Label>
-              <div className="relative">
-                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="sourceUrl"
-                  type="url"
-                  placeholder="https://..."
-                  value={sourceUrl}
-                  onChange={(e) => setSourceUrl(e.target.value)}
-                  className="pl-10 bg-secondary/50 border-border/50"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Notes */}
           <div className="space-y-2">

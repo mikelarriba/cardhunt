@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Pencil, X, ImageIcon, RotateCcw, DollarSign, Calendar, Building2, Tag, FileText } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Pencil, X, ImageIcon, RotateCcw, DollarSign, Calendar, Building2, Tag, FileText, Link2 } from 'lucide-react';
 import { Card, SportType, LEAGUE_LOGOS } from '@/types/database';
 import { StatusBadge } from './StatusBadge';
 import { BrandBadge } from './BrandBadge';
@@ -7,6 +7,7 @@ import { SerialNumberBadge } from './SerialNumberInput';
 import { LeagueLogo } from './LeagueLogo';
 import { BuyOptionsTable } from './BuyOptionsTable';
 import { EditCardModal } from './EditCardModal';
+import { useBuyOptions } from '@/hooks/useBuyOptions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,22 @@ interface CardDetailModalProps {
 export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailModalProps) {
   const [showBack, setShowBack] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const { buyOptions } = useBuyOptions(card.id);
+
+  // Derive price and source_url from cheapest buy option
+  const cheapestOption = useMemo(() => {
+    if (!buyOptions.length) return null;
+    return buyOptions.reduce((best, opt) => {
+      const total = (opt.price ?? 0) + (opt.shipping_cost ?? 0);
+      const bestTotal = (best.price ?? 0) + (best.shipping_cost ?? 0);
+      return total < bestTotal ? opt : best;
+    });
+  }, [buyOptions]);
+
+  const derivedPrice = cheapestOption?.price != null
+    ? (cheapestOption.price + (cheapestOption.shipping_cost ?? 0))
+    : null;
+  const derivedSourceUrl = cheapestOption?.source_url || null;
 
   const cardImage = card.image_front || card.image_url;
   const hasBackImage = !!card.image_back;
@@ -175,14 +192,31 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
                     </div>
                   )}
 
-                  {card.price !== null && (
+                  {derivedPrice !== null && (
                     <div className="flex items-start gap-3">
                       <DollarSign className="w-5 h-5 text-primary mt-0.5" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Price</p>
+                        <p className="text-sm text-muted-foreground">Best Price (incl. shipping)</p>
                         <p className="font-display font-bold text-xl text-primary">
-                          ${card.price.toFixed(2)}
+                          ${derivedPrice.toFixed(2)}
                         </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {derivedSourceUrl && (
+                    <div className="flex items-start gap-3">
+                      <Link2 className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Source</p>
+                        <a
+                          href={derivedSourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline text-sm break-all"
+                        >
+                          {derivedSourceUrl}
+                        </a>
                       </div>
                     </div>
                   )}
