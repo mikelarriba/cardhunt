@@ -10,6 +10,7 @@ const Index = lazy(() => import("./pages/Index"));
 const PlayerDetail = lazy(() => import("./pages/PlayerDetail"));
 const BulkCreatePlayers = lazy(() => import("./pages/BulkCreatePlayers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Sellers = lazy(() => import("./pages/Sellers"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
