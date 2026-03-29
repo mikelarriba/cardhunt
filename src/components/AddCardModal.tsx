@@ -83,8 +83,8 @@ export function AddCardModal({
         card_type: legacyType,
         card_types: [legacyType],
         status,
-        price: price ? parseFloat(price) : null,
-        source_url: sourceUrl || null,
+        price: null,
+        source_url: null,
         notes: notes || null,
         brand: finalBrand || null,
         // New fields
