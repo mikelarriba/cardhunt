@@ -22,10 +22,27 @@ interface CardDetailModalProps {
 export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailModalProps) {
   const [showBack, setShowBack] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const { buyOptions } = useBuyOptions(card.id);
+
+  // Derive price and source_url from cheapest buy option
+  const cheapestOption = useMemo(() => {
+    if (!buyOptions.length) return null;
+    return buyOptions.reduce((best, opt) => {
+      const total = (opt.price ?? 0) + (opt.shipping_cost ?? 0);
+      const bestTotal = (best.price ?? 0) + (best.shipping_cost ?? 0);
+      return total < bestTotal ? opt : best;
+    });
+  }, [buyOptions]);
+
+  const derivedPrice = cheapestOption?.price != null
+    ? (cheapestOption.price + (cheapestOption.shipping_cost ?? 0))
+    : null;
+  const derivedSourceUrl = cheapestOption?.source_url || null;
 
   const cardImage = card.image_front || card.image_url;
   const hasBackImage = !!card.image_back;
   const currentImage = showBack && card.image_back ? card.image_back : cardImage;
+  const displayLabels = card.card_labels?.length ? card.card_labels : [];
   const displayLabels = card.card_labels?.length ? card.card_labels : [];
 
   return (
