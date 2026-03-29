@@ -28,8 +28,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
   // Card labels
   const [cardLabels, setCardLabels] = useState<string[]>(card.card_labels || []);
   const [status, setStatus] = useState<CardStatus>(card.status);
-  const [price, setPrice] = useState(card.price?.toString() || '');
-  const [sourceUrl, setSourceUrl] = useState(card.source_url || '');
   const [notes, setNotes] = useState(card.notes || '');
   const [brand, setBrand] = useState(card.brand || '');
   const [customBrand, setCustomBrand] = useState('');
