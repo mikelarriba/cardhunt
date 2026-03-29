@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DollarSign, Link2, Calendar, Users, Store } from 'lucide-react';
+import { Calendar, Users, Store } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
