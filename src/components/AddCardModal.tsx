@@ -285,43 +285,6 @@ export function AddCardModal({
             </div>
           </div>
 
-          {/* Price */}
-          <div className="space-y-2">
-            <Label htmlFor="price">
-              {status === 'owned' ? 'Paid Price' : 'Price to Pay'}
-            </Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="pl-10 bg-secondary/50 border-border/50"
-              />
-            </div>
-          </div>
-
-          {/* Source URL */}
-          {status !== 'owned' && (
-            <div className="space-y-2 animate-fade-in">
-              <Label htmlFor="sourceUrl">Source URL</Label>
-              <div className="relative">
-                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  id="sourceUrl"
-                  type="url"
-                  placeholder="https://..."
-                  value={sourceUrl}
-                  onChange={(e) => setSourceUrl(e.target.value)}
-                  className="pl-10 bg-secondary/50 border-border/50"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Notes */}
           <div className="space-y-2">
