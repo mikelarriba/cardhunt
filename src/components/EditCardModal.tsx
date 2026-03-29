@@ -51,8 +51,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
     if (open) {
       setCardLabels(card.card_labels || []);
       setStatus(card.status);
-      setPrice(card.price?.toString() || '');
-      setSourceUrl(card.source_url || '');
       setNotes(card.notes || '');
       setBrand(card.brand || '');
       setCustomBrand('');
