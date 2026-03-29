@@ -78,8 +78,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
         updates: {
           card_labels: cardLabels,
           status,
-          price: price ? parseFloat(price) : null,
-          source_url: sourceUrl || null,
           notes: notes || null,
           brand: finalBrand || null,
           series: series || null,

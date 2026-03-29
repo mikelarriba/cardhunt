@@ -36,8 +36,6 @@ export function AddCardModal({
   // Card labels (replacing fixed card types)
   const [cardLabels, setCardLabels] = useState<string[]>([]);
   const [status, setStatus] = useState<CardStatus>('missing');
-  const [price, setPrice] = useState('');
-  const [sourceUrl, setSourceUrl] = useState('');
   const [notes, setNotes] = useState('');
   const [brand, setBrand] = useState('');
   const [customBrand, setCustomBrand] = useState('');
