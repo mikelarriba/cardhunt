@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Plus, LogOut, Sparkles, LayoutGrid, SearchX } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { VirtualPlayerGrid } from './VirtualPlayerGrid';
@@ -145,6 +146,11 @@ export function Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Button variant="ghost" size="icon" asChild title="Sellers">
+                <Link to="/sellers">
+                  <Store className="w-5 h-5" />
+                </Link>
+              </Button>
               <AddPlayerDropdown onAddSingle={() => setShowAddPlayer(true)} />
               <Button
                 variant="ghost"
