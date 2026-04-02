@@ -75,7 +75,7 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
     setName('');
     setSport(null);
     setTeams([]);
-    setCustomTeam('');
+    setTeamInput('');
   };
 
   return (
