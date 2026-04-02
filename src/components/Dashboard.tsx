@@ -257,7 +257,8 @@ export function Dashboard() {
         {selectedTagName && filteredPlayers.length > 0 && (
           <CollectionSummary
             collectionName={selectedTagName}
-            players={filteredPlayers}
+            cards={collectionCards}
+            isSmart={!!selectedTagObj?.filter_rules}
           />
         )}
 
