@@ -38,23 +38,27 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
   const [name, setName] = useState('');
   const [sport, setSport] = useState<SportType | null>(null);
   const [teams, setTeams] = useState<string[]>([]);
-  const [customTeam, setCustomTeam] = useState('');
+  const [teamInput, setTeamInput] = useState('');
   const { createPlayer } = usePlayers();
+  const { ensureTeams } = useTeams();
 
   const handleAddTeam = (team: string) => {
     if (team && !teams.includes(team)) {
       setTeams([...teams, team]);
     }
-    setCustomTeam('');
+    setTeamInput('');
   };
 
   const handleRemoveTeam = (team: string) => {
     setTeams(teams.filter(t => t !== team));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !sport || teams.length === 0) return;
+
+    // Ensure all teams exist in the teams table
+    await ensureTeams(teams, sport);
 
     createPlayer.mutate(
       { name, sport, teams },
