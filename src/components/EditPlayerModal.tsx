@@ -39,8 +39,9 @@ export function EditPlayerModal({ open, onOpenChange, player }: EditPlayerModalP
   const [name, setName] = useState(player.name);
   const [sport, setSport] = useState<SportType>(player.sport);
   const [teams, setTeams] = useState<string[]>(player.teams || []);
-  const [customTeam, setCustomTeam] = useState('');
+  const [teamInput, setTeamInput] = useState('');
   const { updatePlayer } = usePlayers();
+  const { ensureTeams } = useTeams();
 
   useEffect(() => {
     if (open) {
