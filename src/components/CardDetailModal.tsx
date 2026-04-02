@@ -25,7 +25,8 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
   const [showBack, setShowBack] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const { buyOptions } = useBuyOptions(card.id);
-
+  const { useCardTags } = useTags();
+  const { data: cardTags = [] } = useCardTags(card.id);
   // Derive price and source_url from cheapest buy option
   const cheapestOption = useMemo(() => {
     if (!buyOptions.length) return null;
