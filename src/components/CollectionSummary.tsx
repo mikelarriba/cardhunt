@@ -1,39 +1,43 @@
 import { useMemo } from 'react';
-import { PlayerWithCards } from '@/types/database';
-import { Progress } from '@/components/ui/progress';
+import { Card, FilterRules } from '@/types/database';
+import { Sparkles, FolderOpen } from 'lucide-react';
 
 interface CollectionSummaryProps {
   collectionName: string;
-  players: PlayerWithCards[];
+  cards: Card[];
+  isSmart?: boolean;
 }
 
-export function CollectionSummary({ collectionName, players }: CollectionSummaryProps) {
+export function CollectionSummary({ collectionName, cards, isSmart }: CollectionSummaryProps) {
   const stats = useMemo(() => {
-    const allCards = players.flatMap(p => p.cards);
-    const ownedCards = allCards.filter(c => c.status === 'owned').length;
-    const locatedCards = allCards.filter(c => c.status === 'located').length;
-    const missingCards = allCards.filter(c => c.status === 'missing').length;
-    const totalCards = allCards.length;
+    const ownedCards = cards.filter(c => c.status === 'owned').length;
+    const locatedCards = cards.filter(c => c.status === 'located').length;
+    const missingCards = cards.filter(c => c.status === 'missing').length;
+    const totalCards = cards.length;
     
     const ownedPercent = totalCards > 0 ? (ownedCards / totalCards) * 100 : 0;
     
-    return {
-      totalCards,
-      ownedCards,
-      locatedCards,
-      missingCards,
-      ownedPercent,
-    };
-  }, [players]);
+    return { totalCards, ownedCards, locatedCards, missingCards, ownedPercent };
+  }, [cards]);
 
   return (
     <div className="glass-card p-4 mb-6 animate-fade-in">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-display font-semibold text-lg text-foreground">
-          📁 {collectionName}
+        <h2 className="font-display font-semibold text-lg text-foreground flex items-center gap-2">
+          {isSmart ? (
+            <Sparkles className="w-4 h-4 text-primary" />
+          ) : (
+            <FolderOpen className="w-4 h-4 text-primary" />
+          )}
+          {collectionName}
+          {isSmart && (
+            <span className="text-xs font-normal text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              Smart
+            </span>
+          )}
         </h2>
         <span className="text-sm text-muted-foreground">
-          {players.length} {players.length === 1 ? 'player' : 'players'} • {stats.totalCards} cards
+          {stats.totalCards} card{stats.totalCards !== 1 ? 's' : ''}
         </span>
       </div>
       
