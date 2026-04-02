@@ -55,7 +55,7 @@ export function EditPlayerModal({ open, onOpenChange, player }: EditPlayerModalP
     if (team && !teams.includes(team)) {
       setTeams([...teams, team]);
     }
-    setCustomTeam('');
+    setTeamInput('');
   };
 
   const handleRemoveTeam = (team: string) => {
