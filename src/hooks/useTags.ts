@@ -171,8 +171,8 @@ export function useTags() {
   // Card tag mutations
   const addCardTag = useMutation({
     mutationFn: async ({ cardId, tagId }: { cardId: string; tagId: string }) => {
-      const { data, error } = await supabase
-        .from('card_tags' as any)
+      const { data, error } = await (supabase as any)
+        .from('card_tags')
         .insert({ card_id: cardId, tag_id: tagId })
         .select()
         .single();
