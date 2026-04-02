@@ -58,6 +58,13 @@ export function TeamAutocomplete({
         onFocus={() => {
           if (value.length >= 3) setShowSuggestions(true);
         }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && value.trim()) {
+            e.preventDefault();
+            onSelect?.(value.trim());
+            setShowSuggestions(false);
+          }
+        }}
         className={cn(showIcon && 'pl-10', 'bg-secondary/50 border-border/50', className)}
       />
       {showSuggestions && suggestions.length > 0 && (
