@@ -235,6 +235,12 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
                   )}
                 </div>
 
+                {/* Collections */}
+                <div className="pt-4 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">Collections</p>
+                  <TagManager cardId={card.id} cardTags={cardTags} />
+                </div>
+
                 {/* Metadata */}
                 <div className="pt-4 border-t border-border/50 text-xs text-muted-foreground space-y-1">
                   <p>Added: {new Date(card.created_at).toLocaleDateString()}</p>
