@@ -192,8 +192,8 @@ export function useTags() {
 
   const removeCardTag = useMutation({
     mutationFn: async ({ cardId, tagId }: { cardId: string; tagId: string }) => {
-      const { error } = await supabase
-        .from('card_tags' as any)
+      const { error } = await (supabase as any)
+        .from('card_tags')
         .delete()
         .eq('card_id', cardId)
         .eq('tag_id', tagId);
