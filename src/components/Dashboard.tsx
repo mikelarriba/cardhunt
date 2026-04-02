@@ -318,6 +318,7 @@ export function Dashboard() {
       </main>
 
       <AddPlayerModal open={showAddPlayer} onOpenChange={setShowAddPlayer} />
+      <CollectionFilterBuilder open={showSmartBuilder} onOpenChange={setShowSmartBuilder} />
     </div>
   );
 }
