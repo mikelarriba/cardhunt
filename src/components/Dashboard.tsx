@@ -21,6 +21,7 @@ import { SportType, CardStatus } from '@/types/database';
 
 export function Dashboard() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [showSmartBuilder, setShowSmartBuilder] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CardStatus | 'all'>('all');
@@ -28,7 +29,7 @@ export function Dashboard() {
   const [selectedTeam, setSelectedTeam] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useViewMode();
   const { players, isLoading } = usePlayers();
-  const { tags } = useTags();
+  const { tags, cardTagLinks } = useTags();
   const { signOut, user } = useAuth();
 
   const handleSignOut = async () => {
