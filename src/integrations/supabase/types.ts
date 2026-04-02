@@ -65,6 +65,42 @@ export type Database = {
           },
         ]
       }
+      card_tags: {
+        Row: {
+          card_id: string
+          created_at: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "card_tags_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "card_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cards: {
         Row: {
           brand: string | null
@@ -247,18 +283,21 @@ export type Database = {
       tags: {
         Row: {
           created_at: string
+          filter_rules: Json | null
           id: string
           name: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          filter_rules?: Json | null
           id?: string
           name: string
           user_id: string
         }
         Update: {
           created_at?: string
+          filter_rules?: Json | null
           id?: string
           name?: string
           user_id?: string
