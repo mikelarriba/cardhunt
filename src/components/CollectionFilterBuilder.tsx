@@ -178,7 +178,7 @@ function ConditionValueInput({
   }
 
   // Team field: use autocomplete
-  if (condition.field === 'card_team' && condition.operator !== 'in') {
+  if (condition.field === 'card_team') {
     return (
       <TeamAutocomplete
         value={String(condition.value || '')}
