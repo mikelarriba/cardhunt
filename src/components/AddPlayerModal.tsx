@@ -155,45 +155,19 @@ export function AddPlayerModal({ open, onOpenChange }: AddPlayerModalProps) {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2 mb-2">
-                {POPULAR_TEAMS[sport].map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => handleAddTeam(t)}
-                    disabled={teams.includes(t)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg text-sm transition-all duration-200',
-                      teams.includes(t)
-                        ? 'bg-primary/30 text-primary cursor-not-allowed'
-                        : 'bg-secondary/50 hover:bg-secondary text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
               <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    placeholder="Add custom team..."
-                    value={customTeam}
-                    onChange={(e) => setCustomTeam(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddTeam(customTeam);
-                      }
-                    }}
-                    className="pl-10 bg-secondary/50 border-border/50"
-                  />
-                </div>
+                <TeamAutocomplete
+                  value={teamInput}
+                  onChange={setTeamInput}
+                  onSelect={handleAddTeam}
+                  placeholder="Type 3+ letters to search teams..."
+                  className="flex-1"
+                />
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => handleAddTeam(customTeam)}
-                  disabled={!customTeam}
+                  onClick={() => handleAddTeam(teamInput)}
+                  disabled={!teamInput}
                 >
                   Add
                 </Button>
