@@ -5,7 +5,6 @@ import { PlayerWithCards } from '@/types/database';
 import { SportBadge } from './SportBadge';
 import { ProgressDots } from './ProgressDots';
 import { AddCardModal } from './AddCardModal';
-import { TagManager } from './TagManager';
 import { TeamPillList } from './TeamPill';
 import { Button } from '@/components/ui/button';
 import {
@@ -147,10 +146,12 @@ export function PlayerCard({ player }: PlayerCardProps) {
           </div>
         </div>
 
-        {/* Tags & Quick Actions - Below card */}
+        {/* Quick Actions - Below card */}
         <div className="p-3 border-t border-border/30" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between">
-            <TagManager playerId={player.id} playerTags={player.tags || []} />
+            <span className="text-xs text-muted-foreground">
+              {player.cards.length} card{player.cards.length !== 1 ? 's' : ''}
+            </span>
             <Button
               variant="ghost"
               size="sm"

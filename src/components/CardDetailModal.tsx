@@ -7,7 +7,9 @@ import { SerialNumberBadge } from './SerialNumberInput';
 import { LeagueLogo } from './LeagueLogo';
 import { BuyOptionsTable } from './BuyOptionsTable';
 import { EditCardModal } from './EditCardModal';
+import { TagManager } from './TagManager';
 import { useBuyOptions } from '@/hooks/useBuyOptions';
+import { useTags } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -23,7 +25,8 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
   const [showBack, setShowBack] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const { buyOptions } = useBuyOptions(card.id);
-
+  const { useCardTags } = useTags();
+  const { data: cardTags = [] } = useCardTags(card.id);
   // Derive price and source_url from cheapest buy option
   const cheapestOption = useMemo(() => {
     if (!buyOptions.length) return null;
@@ -230,6 +233,12 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
                       </div>
                     </div>
                   )}
+                </div>
+
+                {/* Collections */}
+                <div className="pt-4 border-t border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">Collections</p>
+                  <TagManager cardId={card.id} cardTags={cardTags} />
                 </div>
 
                 {/* Metadata */}

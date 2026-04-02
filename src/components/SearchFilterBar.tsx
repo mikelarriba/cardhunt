@@ -108,15 +108,15 @@ export function SearchFilterBar({
 
         {/* Collection Filter */}
         <Select value={selectedTag} onValueChange={onTagChange}>
-          <SelectTrigger className="w-[160px] h-9 bg-background/50 border-border/50">
+          <SelectTrigger className="w-[180px] h-9 bg-background/50 border-border/50">
             <SelectValue placeholder="Collection" />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
             <SelectItem value="all">All Collections</SelectItem>
-            {tags.map((tag) => (
+            {tags.map((tag: any) => (
               <SelectItem key={tag.id} value={tag.id}>
                 <span className="flex items-center gap-2">
-                  <span>📁</span>
+                  <span>{tag.filter_rules ? '✨' : '📁'}</span>
                   {tag.name}
                 </span>
               </SelectItem>

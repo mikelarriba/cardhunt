@@ -2,16 +2,35 @@ export type SportType = 'football' | 'basketball' | 'baseball' | 'hockey' | 'soc
 export type CardType = 'rookie' | 'regular' | 'autographed' | 'rated';
 export type CardStatus = 'owned' | 'located' | 'missing';
 
+export interface FilterCondition {
+  field: 'card_team' | 'card_labels' | 'brand' | 'series' | 'status' | 'card_year' | 'sport';
+  operator: 'equals' | 'contains' | 'in';
+  value: string | string[];
+}
+
+export interface FilterRules {
+  conditions: FilterCondition[];
+  logic: 'and' | 'or';
+}
+
 export interface Tag {
   id: string;
   user_id: string;
   name: string;
   created_at: string;
+  filter_rules?: FilterRules | null;
 }
 
 export interface PlayerTag {
   id: string;
   player_id: string;
+  tag_id: string;
+  created_at: string;
+}
+
+export interface CardTag {
+  id: string;
+  card_id: string;
   tag_id: string;
   created_at: string;
 }

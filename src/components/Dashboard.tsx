@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store } from 'lucide-react';
+import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { VirtualPlayerGrid } from './VirtualPlayerGrid';
@@ -10,16 +10,18 @@ import { AddPlayerModal } from './AddPlayerModal';
 import { AddPlayerDropdown } from './AddPlayerDropdown';
 import { SearchFilterBar } from './SearchFilterBar';
 import { CollectionSummary } from './CollectionSummary';
+import { CollectionFilterBuilder } from './CollectionFilterBuilder';
 import { ThemeToggle } from './ThemeToggle';
 import { ViewSwitcher } from './ViewSwitcher';
 import { usePlayers } from '@/hooks/usePlayers';
-import { useTags } from '@/hooks/useTags';
+import { useTags, cardMatchesRules } from '@/hooks/useTags';
 import { useAuth } from '@/hooks/useAuth';
 import { useViewMode } from '@/hooks/useViewMode';
 import { SportType, CardStatus } from '@/types/database';
 
 export function Dashboard() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [showSmartBuilder, setShowSmartBuilder] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CardStatus | 'all'>('all');
@@ -27,7 +29,7 @@ export function Dashboard() {
   const [selectedTeam, setSelectedTeam] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useViewMode();
   const { players, isLoading } = usePlayers();
-  const { tags } = useTags();
+  const { tags, cardTagLinks } = useTags();
   const { signOut, user } = useAuth();
 
   const handleSignOut = async () => {
@@ -66,6 +68,9 @@ export function Dashboard() {
   };
 
   const filteredPlayers = useMemo(() => {
+    // Find the selected tag to check if it's smart or manual
+    const selectedTagObj = selectedTag !== 'all' ? tags.find(t => t.id === selectedTag) : null;
+
     return players.filter((player) => {
       // Text search filter
       if (searchQuery) {
@@ -74,16 +79,25 @@ export function Dashboard() {
         const matchesTeam = player.teams?.some((team) =>
           team.toLowerCase().includes(query)
         );
-        const matchesCollection = player.tags?.some((tag) =>
-          tag.name.toLowerCase().includes(query)
-        );
-        if (!matchesName && !matchesTeam && !matchesCollection) return false;
+        if (!matchesName && !matchesTeam) return false;
       }
 
-      // Filter by tag/collection
-      if (selectedTag !== 'all') {
-        const hasTag = player.tags?.some((t) => t.id === selectedTag);
-        if (!hasTag) return false;
+      // Filter by tag/collection (card-based)
+      if (selectedTag !== 'all' && selectedTagObj) {
+        if (selectedTagObj.filter_rules) {
+          // Smart collection: check if any card matches the rules
+          const hasMatchingCard = player.cards.some(card =>
+            cardMatchesRules(card, selectedTagObj.filter_rules!, player.sport)
+          );
+          if (!hasMatchingCard) return false;
+        } else {
+          // Manual collection: check card_tags
+          const playerCardIds = new Set(player.cards.map(c => c.id));
+          const hasTaggedCard = cardTagLinks.some(
+            ct => ct.tag_id === selectedTag && playerCardIds.has(ct.card_id)
+          );
+          if (!hasTaggedCard) return false;
+        }
       }
 
       // Filter by team
@@ -107,7 +121,7 @@ export function Dashboard() {
 
       return true;
     });
-  }, [players, searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam]);
+  }, [players, searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam, tags, cardTagLinks]);
 
   const stats = useMemo(() => {
     const allCards = players.flatMap((p) => p.cards);
@@ -122,10 +136,23 @@ export function Dashboard() {
     };
   }, [players]);
 
-  const selectedTagName = useMemo(() => {
+  const selectedTagObj = useMemo(() => {
     if (selectedTag === 'all') return null;
-    return tags.find((t) => t.id === selectedTag)?.name || null;
+    return tags.find((t) => t.id === selectedTag) || null;
   }, [selectedTag, tags]);
+
+  const selectedTagName = selectedTagObj?.name || null;
+
+  // Collect all cards matching the selected collection for the summary
+  const collectionCards = useMemo(() => {
+    if (!selectedTagObj) return [];
+    return filteredPlayers.flatMap(p => {
+      if (selectedTagObj.filter_rules) {
+        return p.cards.filter(c => cardMatchesRules(c, selectedTagObj.filter_rules!, p.sport));
+      }
+      return p.cards.filter(c => cardTagLinks.some(ct => ct.tag_id === selectedTag && ct.card_id === c.id));
+    });
+  }, [filteredPlayers, selectedTagObj, selectedTag, cardTagLinks]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,6 +177,9 @@ export function Dashboard() {
                 <Link to="/sellers">
                   <Store className="w-5 h-5" />
                 </Link>
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowSmartBuilder(true)} title="Smart Collection">
+                <Wand2 className="w-5 h-5" />
               </Button>
               <AddPlayerDropdown onAddSingle={() => setShowAddPlayer(true)} />
               <Button
@@ -230,7 +260,8 @@ export function Dashboard() {
         {selectedTagName && filteredPlayers.length > 0 && (
           <CollectionSummary
             collectionName={selectedTagName}
-            players={filteredPlayers}
+            cards={collectionCards}
+            isSmart={!!selectedTagObj?.filter_rules}
           />
         )}
 
@@ -287,6 +318,7 @@ export function Dashboard() {
       </main>
 
       <AddPlayerModal open={showAddPlayer} onOpenChange={setShowAddPlayer} />
+      <CollectionFilterBuilder open={showSmartBuilder} onOpenChange={setShowSmartBuilder} />
     </div>
   );
 }
