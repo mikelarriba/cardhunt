@@ -178,6 +178,9 @@ export function Dashboard() {
                   <Store className="w-5 h-5" />
                 </Link>
               </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowSmartBuilder(true)} title="Smart Collection">
+                <Wand2 className="w-5 h-5" />
+              </Button>
               <AddPlayerDropdown onAddSingle={() => setShowAddPlayer(true)} />
               <Button
                 variant="ghost"
