@@ -67,8 +67,8 @@ export function useTags() {
     return useQuery({
       queryKey: ['card_tags', cardId],
       queryFn: async () => {
-        const { data, error } = await supabase
-          .from('card_tags' as any)
+        const { data, error } = await (supabase as any)
+          .from('card_tags')
           .select('*, tags:tag_id (id, user_id, name, created_at, filter_rules)')
           .eq('card_id', cardId);
         if (error) throw error;
@@ -82,8 +82,8 @@ export function useTags() {
   const allCardTagsQuery = useQuery({
     queryKey: ['card_tags_all'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('card_tags' as any)
+      const { data, error } = await (supabase as any)
+        .from('card_tags')
         .select('card_id, tag_id');
       if (error) throw error;
       return (data || []) as { card_id: string; tag_id: string }[];
