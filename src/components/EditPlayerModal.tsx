@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Building2, X } from 'lucide-react';
+import { User, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,8 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Player, SportType, SPORTS, POPULAR_TEAMS } from '@/types/database';
+import { Player, SportType, SPORTS } from '@/types/database';
 import { usePlayers } from '@/hooks/usePlayers';
+import { useTeams } from '@/hooks/useTeams';
+import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { cn } from '@/lib/utils';
 
 interface EditPlayerModalProps {
