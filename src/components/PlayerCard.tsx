@@ -6,7 +6,6 @@ import { SportBadge } from './SportBadge';
 import { ProgressDots } from './ProgressDots';
 import { AddCardModal } from './AddCardModal';
 import { TeamPillList } from './TeamPill';
-import { TeamPillList } from './TeamPill';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
