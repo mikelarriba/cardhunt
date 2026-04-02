@@ -13,42 +13,45 @@ import { Tag } from '@/types/database';
 import { cn } from '@/lib/utils';
 
 interface TagManagerProps {
-  playerId: string;
-  playerTags: Tag[];
+  cardId: string;
+  cardTags: Tag[];
 }
 
-export function TagManager({ playerId, playerTags }: TagManagerProps) {
+export function TagManager({ cardId, cardTags }: TagManagerProps) {
   const [newTagName, setNewTagName] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const { tags, createTag, addPlayerTag, removePlayerTag } = useTags();
+  const { tags, createTag, addCardTag, removeCardTag } = useTags();
+
+  // Only show manual collections (no filter_rules)
+  const manualTags = tags.filter(t => !t.filter_rules);
 
   const handleCreateAndAssign = async () => {
     if (!newTagName.trim()) return;
     
-    const result = await createTag.mutateAsync(newTagName.trim());
+    const result = await createTag.mutateAsync({ name: newTagName.trim() });
     if (result) {
-      addPlayerTag.mutate({ playerId, tagId: result.id });
+      addCardTag.mutate({ cardId, tagId: result.id });
     }
     setNewTagName('');
   };
 
   const handleToggleTag = (tag: Tag) => {
-    const isAssigned = playerTags.some(pt => pt.id === tag.id);
+    const isAssigned = cardTags.some(ct => ct.id === tag.id);
     if (isAssigned) {
-      removePlayerTag.mutate({ playerId, tagId: tag.id });
+      removeCardTag.mutate({ cardId, tagId: tag.id });
     } else {
-      addPlayerTag.mutate({ playerId, tagId: tag.id });
+      addCardTag.mutate({ cardId, tagId: tag.id });
     }
   };
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
-      {playerTags.map((tag) => (
+      {cardTags.map((tag) => (
         <Badge
           key={tag.id}
           variant="secondary"
           className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 cursor-pointer"
-          onClick={() => removePlayerTag.mutate({ playerId, tagId: tag.id })}
+          onClick={() => removeCardTag.mutate({ cardId, tagId: tag.id })}
         >
           {tag.name}
           <X className="w-3 h-3 ml-1" />
@@ -63,7 +66,7 @@ export function TagManager({ playerId, playerTags }: TagManagerProps) {
             className="h-6 px-2 text-xs text-muted-foreground hover:text-primary"
           >
             <TagIcon className="w-3 h-3 mr-1" />
-            {playerTags.length === 0 ? 'Add to Collection' : '+'}
+            {cardTags.length === 0 ? 'Add to Collection' : '+'}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-64 p-3 bg-popover border-border" align="start">
@@ -72,10 +75,10 @@ export function TagManager({ playerId, playerTags }: TagManagerProps) {
               Collections
             </div>
             
-            {tags.length > 0 && (
+            {manualTags.length > 0 && (
               <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
-                {tags.map((tag) => {
-                  const isAssigned = playerTags.some(pt => pt.id === tag.id);
+                {manualTags.map((tag) => {
+                  const isAssigned = cardTags.some(ct => ct.id === tag.id);
                   return (
                     <Badge
                       key={tag.id}
