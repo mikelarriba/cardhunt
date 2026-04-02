@@ -177,6 +177,19 @@ function ConditionValueInput({
     );
   }
 
+  // Team field: use autocomplete
+  if (condition.field === 'card_team' && condition.operator !== 'in') {
+    return (
+      <TeamAutocomplete
+        value={String(condition.value || '')}
+        onChange={onChange}
+        onSelect={onChange}
+        placeholder="Type 3+ letters to search teams..."
+        showIcon={false}
+      />
+    );
+  }
+
   return (
     <Input
       placeholder="Enter value..."
