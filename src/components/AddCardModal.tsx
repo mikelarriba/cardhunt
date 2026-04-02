@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { Calendar, Users, Store } from 'lucide-react';
 import {
   Dialog,
