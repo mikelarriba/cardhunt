@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, X, Sparkles, Trash2 } from 'lucide-react';
+import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -173,6 +174,19 @@ function ConditionValueInput({
           </Button>
         </div>
       </div>
+    );
+  }
+
+  // Team field: use autocomplete
+  if (condition.field === 'card_team') {
+    return (
+      <TeamAutocomplete
+        value={String(condition.value || '')}
+        onChange={onChange}
+        onSelect={onChange}
+        placeholder="Type 3+ letters to search teams..."
+        showIcon={false}
+      />
     );
   }
 

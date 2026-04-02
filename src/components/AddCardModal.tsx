@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { Calendar, Users, Store } from 'lucide-react';
 import {
   Dialog,
@@ -236,12 +237,12 @@ export function AddCardModal({
                 <Users className="w-3 h-3" />
                 Team
               </Label>
-              <Input
-                id="cardTeam"
-                placeholder="Lakers"
+              <TeamAutocomplete
                 value={cardTeam}
-                onChange={(e) => setCardTeam(e.target.value)}
-                className="bg-secondary/50 border-border/50"
+                onChange={setCardTeam}
+                onSelect={setCardTeam}
+                placeholder="Type 3+ letters..."
+                showIcon={false}
               />
             </div>
             <div className="space-y-2">
