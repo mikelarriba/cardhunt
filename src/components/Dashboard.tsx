@@ -68,6 +68,9 @@ export function Dashboard() {
   };
 
   const filteredPlayers = useMemo(() => {
+    // Find the selected tag to check if it's smart or manual
+    const selectedTagObj = selectedTag !== 'all' ? tags.find(t => t.id === selectedTag) : null;
+
     return players.filter((player) => {
       // Text search filter
       if (searchQuery) {
@@ -76,16 +79,25 @@ export function Dashboard() {
         const matchesTeam = player.teams?.some((team) =>
           team.toLowerCase().includes(query)
         );
-        const matchesCollection = player.tags?.some((tag) =>
-          tag.name.toLowerCase().includes(query)
-        );
-        if (!matchesName && !matchesTeam && !matchesCollection) return false;
+        if (!matchesName && !matchesTeam) return false;
       }
 
-      // Filter by tag/collection
-      if (selectedTag !== 'all') {
-        const hasTag = player.tags?.some((t) => t.id === selectedTag);
-        if (!hasTag) return false;
+      // Filter by tag/collection (card-based)
+      if (selectedTag !== 'all' && selectedTagObj) {
+        if (selectedTagObj.filter_rules) {
+          // Smart collection: check if any card matches the rules
+          const hasMatchingCard = player.cards.some(card =>
+            cardMatchesRules(card, selectedTagObj.filter_rules!, player.sport)
+          );
+          if (!hasMatchingCard) return false;
+        } else {
+          // Manual collection: check card_tags
+          const playerCardIds = new Set(player.cards.map(c => c.id));
+          const hasTaggedCard = cardTagLinks.some(
+            ct => ct.tag_id === selectedTag && playerCardIds.has(ct.card_id)
+          );
+          if (!hasTaggedCard) return false;
+        }
       }
 
       // Filter by team
@@ -109,7 +121,7 @@ export function Dashboard() {
 
       return true;
     });
-  }, [players, searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam]);
+  }, [players, searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam, tags, cardTagLinks]);
 
   const stats = useMemo(() => {
     const allCards = players.flatMap((p) => p.cards);
