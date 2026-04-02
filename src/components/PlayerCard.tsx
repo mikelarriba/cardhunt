@@ -5,7 +5,7 @@ import { PlayerWithCards } from '@/types/database';
 import { SportBadge } from './SportBadge';
 import { ProgressDots } from './ProgressDots';
 import { AddCardModal } from './AddCardModal';
-import { TagManager } from './TagManager';
+import { TeamPillList } from './TeamPill';
 import { TeamPillList } from './TeamPill';
 import { Button } from '@/components/ui/button';
 import {
