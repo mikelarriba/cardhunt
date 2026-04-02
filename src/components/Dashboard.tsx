@@ -136,10 +136,23 @@ export function Dashboard() {
     };
   }, [players]);
 
-  const selectedTagName = useMemo(() => {
+  const selectedTagObj = useMemo(() => {
     if (selectedTag === 'all') return null;
-    return tags.find((t) => t.id === selectedTag)?.name || null;
+    return tags.find((t) => t.id === selectedTag) || null;
   }, [selectedTag, tags]);
+
+  const selectedTagName = selectedTagObj?.name || null;
+
+  // Collect all cards matching the selected collection for the summary
+  const collectionCards = useMemo(() => {
+    if (!selectedTagObj) return [];
+    return filteredPlayers.flatMap(p => {
+      if (selectedTagObj.filter_rules) {
+        return p.cards.filter(c => cardMatchesRules(c, selectedTagObj.filter_rules!, p.sport));
+      }
+      return p.cards.filter(c => cardTagLinks.some(ct => ct.tag_id === selectedTag && ct.card_id === c.id));
+    });
+  }, [filteredPlayers, selectedTagObj, selectedTag, cardTagLinks]);
 
   return (
     <div className="min-h-screen bg-background">
