@@ -62,9 +62,11 @@ export function EditPlayerModal({ open, onOpenChange, player }: EditPlayerModalP
     setTeams(teams.filter(t => t !== team));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !sport || teams.length === 0) return;
+
+    await ensureTeams(teams, sport);
 
     updatePlayer.mutate(
       { playerId: player.id, updates: { name, sport, teams } },
