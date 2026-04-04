@@ -61,9 +61,9 @@ function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: Pla
   return (
     <div className="glass-card overflow-hidden">
       {/* Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors"
+      <Link
+        to={`/collection/${tag.id}`}
+        className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors block"
       >
         <div className="flex items-center gap-3">
           {tag.filter_rules ? (
