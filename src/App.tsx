@@ -12,6 +12,7 @@ const BulkCreatePlayers = lazy(() => import("./pages/BulkCreatePlayers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Sellers = lazy(() => import("./pages/Sellers"));
 const Collections = lazy(() => import("./pages/Collections"));
+const CollectionDetail = lazy(() => import("./pages/CollectionDetail"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
