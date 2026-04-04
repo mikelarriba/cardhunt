@@ -101,9 +101,9 @@ function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: Pla
               <span className="text-xs text-status-missing">{stats.missing}✗</span>
             </div>
           </div>
-          {expanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </div>
-      </button>
+      </Link>
 
       {/* Progress bar */}
       <div className="px-4 pb-2">
