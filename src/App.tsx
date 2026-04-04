@@ -11,6 +11,7 @@ const PlayerDetail = lazy(() => import("./pages/PlayerDetail"));
 const BulkCreatePlayers = lazy(() => import("./pages/BulkCreatePlayers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Sellers = lazy(() => import("./pages/Sellers"));
+const Collections = lazy(() => import("./pages/Collections"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/player/:id" element={<PlayerDetail />} />
               <Route path="/bulk-create" element={<BulkCreatePlayers />} />
               <Route path="/sellers" element={<Sellers />} />
+              <Route path="/collections" element={<Collections />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

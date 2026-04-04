@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2 } from 'lucide-react';
+import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { VirtualPlayerGrid } from './VirtualPlayerGrid';
@@ -173,6 +173,11 @@ export function Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Button variant="ghost" size="icon" asChild title="Collections">
+                <Link to="/collections">
+                  <FolderOpen className="w-5 h-5" />
+                </Link>
+              </Button>
               <Button variant="ghost" size="icon" asChild title="Sellers">
                 <Link to="/sellers">
                   <Store className="w-5 h-5" />
