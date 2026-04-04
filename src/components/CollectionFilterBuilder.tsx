@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, X, Sparkles, Trash2 } from 'lucide-react';
 import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { Button } from '@/components/ui/button';
@@ -19,13 +19,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { FilterRules, FilterCondition, SPORTS, CARD_STATUSES } from '@/types/database';
+import { FilterRules, FilterCondition, SPORTS, CARD_STATUSES, Tag } from '@/types/database';
 import { useTags } from '@/hooks/useTags';
 import { cn } from '@/lib/utils';
 
 interface CollectionFilterBuilderProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** If provided, edit this existing collection instead of creating a new one */
+  editTag?: Tag | null;
 }
 
 const CARD_TYPE_SLOTS = ['Rookie', 'Autographed', 'Base'] as const;
@@ -180,7 +182,6 @@ function ConditionValueInput({
     );
   }
 
-  // Team field: use autocomplete
   if (condition.field === 'card_team') {
     return (
       <TeamAutocomplete
@@ -203,14 +204,75 @@ function ConditionValueInput({
   );
 }
 
-export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilterBuilderProps) {
+/** Parse existing filter_rules to extract card type selections and extra conditions */
+function parseFilterRules(rules: FilterRules | null | undefined): {
+  cardTypes: string[];
+  conditions: FilterCondition[];
+  logic: 'and' | 'or';
+} {
+  if (!rules) return { cardTypes: [], conditions: [], logic: 'and' };
+
+  const cardTypeSlots = ['rookie', 'autographed', 'base'];
+  const cardTypes: string[] = [];
+  const conditions: FilterCondition[] = [];
+
+  for (const cond of rules.conditions) {
+    if (cond.field === 'card_labels') {
+      // Extract card type selections
+      if (cond.operator === 'contains' && typeof cond.value === 'string') {
+        if (cardTypeSlots.includes(cond.value.toLowerCase())) {
+          cardTypes.push(cond.value);
+          continue;
+        }
+      }
+      if (cond.operator === 'in' && Array.isArray(cond.value)) {
+        const types = cond.value.filter(v => cardTypeSlots.includes(v.toLowerCase()));
+        const others = cond.value.filter(v => !cardTypeSlots.includes(v.toLowerCase()));
+        cardTypes.push(...types);
+        if (others.length > 0) {
+          conditions.push({ ...cond, value: others });
+        }
+        continue;
+      }
+    }
+    conditions.push(cond);
+  }
+
+  return {
+    cardTypes,
+    conditions: conditions.length > 0 ? conditions : [{ field: 'card_team', operator: 'equals', value: '' }],
+    logic: rules.logic,
+  };
+}
+
+export function CollectionFilterBuilder({ open, onOpenChange, editTag }: CollectionFilterBuilderProps) {
+  const isEdit = !!editTag;
+  const parsed = parseFilterRules(editTag?.filter_rules as FilterRules | null);
+
   const [name, setName] = useState('');
   const [selectedCardTypes, setSelectedCardTypes] = useState<string[]>([]);
   const [logic, setLogic] = useState<'and' | 'or'>('and');
   const [conditions, setConditions] = useState<FilterCondition[]>([
     { field: 'card_team', operator: 'equals', value: '' },
   ]);
-  const { createTag } = useTags();
+  const { createTag, updateTag } = useTags();
+
+  // Reset form when opening or when editTag changes
+  useEffect(() => {
+    if (open) {
+      if (editTag) {
+        setName(editTag.name);
+        setSelectedCardTypes(parsed.cardTypes);
+        setLogic(parsed.logic);
+        setConditions(parsed.conditions);
+      } else {
+        setName('');
+        setSelectedCardTypes([]);
+        setLogic('and');
+        setConditions([{ field: 'card_team', operator: 'equals', value: '' }]);
+      }
+    }
+  }, [open, editTag?.id]);
 
   const toggleCardType = (type: string) => {
     setSelectedCardTypes(prev =>
@@ -237,51 +299,43 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
     }));
   };
 
-  const handleSubmit = () => {
-    if (!name.trim() || selectedCardTypes.length === 0) return;
-
-    // Build conditions: card type condition + additional user conditions
+  const buildFilterRules = (): FilterRules => {
     const allConditions: FilterCondition[] = [];
 
-    // Add card type condition
     if (selectedCardTypes.length === 1) {
-      allConditions.push({
-        field: 'card_labels',
-        operator: 'contains',
-        value: selectedCardTypes[0],
-      });
-    } else {
-      allConditions.push({
-        field: 'card_labels',
-        operator: 'in',
-        value: selectedCardTypes,
-      });
+      allConditions.push({ field: 'card_labels', operator: 'contains', value: selectedCardTypes[0] });
+    } else if (selectedCardTypes.length > 1) {
+      allConditions.push({ field: 'card_labels', operator: 'in', value: selectedCardTypes });
     }
 
-    // Add user-defined conditions
     const validConditions = conditions.filter(c => {
       if (Array.isArray(c.value)) return c.value.length > 0;
       return String(c.value).trim() !== '';
     });
     allConditions.push(...validConditions);
 
-    // If we have card types + additional conditions, use AND logic between them
-    // The card type part uses OR internally (any of the selected types)
-    const filterRules: FilterRules = { conditions: allConditions, logic };
-
-    createTag.mutate(
-      { name: name.trim(), filterRules },
-      {
-        onSuccess: () => {
-          onOpenChange(false);
-          setName('');
-          setSelectedCardTypes([]);
-          setLogic('and');
-          setConditions([{ field: 'card_team', operator: 'equals', value: '' }]);
-        },
-      }
-    );
+    return { conditions: allConditions, logic };
   };
+
+  const handleSubmit = () => {
+    if (!name.trim() || selectedCardTypes.length === 0) return;
+
+    const filterRules = buildFilterRules();
+
+    if (isEdit && editTag) {
+      updateTag.mutate(
+        { tagId: editTag.id, updates: { name: name.trim(), filter_rules: filterRules } },
+        { onSuccess: () => onOpenChange(false) }
+      );
+    } else {
+      createTag.mutate(
+        { name: name.trim(), filterRules },
+        { onSuccess: () => onOpenChange(false) }
+      );
+    }
+  };
+
+  const isPending = isEdit ? updateTag.isPending : createTag.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -289,12 +343,11 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
         <DialogHeader>
           <DialogTitle className="font-display text-xl flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            Create Smart Collection
+            {isEdit ? 'Edit Collection' : 'Create Smart Collection'}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* Collection Name */}
           <div className="space-y-2">
             <Label>Collection Name</Label>
             <Input
@@ -305,7 +358,6 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
             />
           </div>
 
-          {/* Card Type Selection - Required */}
           <div className="space-y-3">
             <Label>Card Types <span className="text-xs text-muted-foreground">(select at least one)</span></Label>
             <div className="flex gap-3">
@@ -330,7 +382,6 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
             </div>
           </div>
 
-          {/* Logic Toggle */}
           <div className="space-y-2">
             <Label>Match</Label>
             <div className="flex gap-2">
@@ -361,7 +412,6 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
             </div>
           </div>
 
-          {/* Additional Conditions */}
           <div className="space-y-3">
             <Label>Additional Conditions <span className="text-xs text-muted-foreground">(optional)</span></Label>
             {conditions.map((cond, i) => (
@@ -432,13 +482,12 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
             </Button>
           </div>
 
-          {/* Submit */}
           <Button
             onClick={handleSubmit}
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={!name.trim() || selectedCardTypes.length === 0 || createTag.isPending}
+            disabled={!name.trim() || selectedCardTypes.length === 0 || isPending}
           >
-            {createTag.isPending ? 'Creating...' : 'Create Smart Collection'}
+            {isPending ? (isEdit ? 'Saving...' : 'Creating...') : (isEdit ? 'Save Changes' : 'Create Smart Collection')}
           </Button>
         </div>
       </DialogContent>
