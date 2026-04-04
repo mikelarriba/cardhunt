@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Sparkles, FolderOpen, ChevronDown, ChevronRight, Wand2, Users } from 'lucide-react';
+import { ArrowLeft, Sparkles, FolderOpen, ChevronRight, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { CollectionFilterBuilder } from '@/components/CollectionFilterBuilder';
@@ -25,7 +25,6 @@ interface CollectionPlayerRow {
 }
 
 function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: PlayerWithCards[]; cardTagLinks: { card_id: string; tag_id: string }[] }) {
-  const [expanded, setExpanded] = useState(false);
 
   const { rows, stats } = useMemo(() => {
     const rows: CollectionPlayerRow[] = [];
@@ -61,9 +60,9 @@ function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: Pla
   return (
     <div className="glass-card overflow-hidden">
       {/* Header */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors"
+      <Link
+        to={`/collection/${tag.id}`}
+        className="w-full p-4 flex items-center justify-between hover:bg-secondary/30 transition-colors block"
       >
         <div className="flex items-center gap-3">
           {tag.filter_rules ? (
@@ -101,9 +100,9 @@ function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: Pla
               <span className="text-xs text-status-missing">{stats.missing}✗</span>
             </div>
           </div>
-          {expanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+          <ChevronRight className="w-4 h-4 text-muted-foreground" />
         </div>
-      </button>
+      </Link>
 
       {/* Progress bar */}
       <div className="px-4 pb-2">
@@ -119,71 +118,6 @@ function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: Pla
         </div>
       </div>
 
-      {/* Expanded player list */}
-      {expanded && (
-        <div className="border-t border-border/30">
-          {/* Table header */}
-          <div className="grid grid-cols-[1fr_80px_80px_80px_60px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-b border-border/20">
-            <span>Player</span>
-            {CARD_SLOTS.map(slot => (
-              <span key={slot} className="text-center">{slot}</span>
-            ))}
-            <span className="text-center">%</span>
-          </div>
-
-          {rows.map(({ player, matchingCards }) => {
-            const slotStatuses = CARD_SLOTS.map(slot => {
-              const slotCards = matchingCards.filter(c => cardHasSlot(c, slot));
-              if (slotCards.length === 0) return 'none';
-              if (slotCards.some(c => c.status === 'owned')) return 'owned';
-              if (slotCards.some(c => c.status === 'located')) return 'located';
-              return 'missing';
-            });
-
-            const ownedSlots = slotStatuses.filter(s => s === 'owned').length;
-            const activeSlots = slotStatuses.filter(s => s !== 'none').length;
-            const playerPct = activeSlots > 0 ? (ownedSlots / activeSlots) * 100 : 0;
-
-            return (
-              <Link
-                key={player.id}
-                to={`/player/${player.id}`}
-                className="grid grid-cols-[1fr_80px_80px_80px_60px] gap-2 px-4 py-3 hover:bg-secondary/30 transition-colors items-center"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-medium text-sm text-foreground truncate">{player.name}</span>
-                  <SportBadge sport={player.sport} />
-                </div>
-
-                {CARD_SLOTS.map((slot, i) => {
-                  const status = slotStatuses[i];
-                  return (
-                    <div key={slot} className="flex justify-center">
-                      <div
-                        className={cn(
-                          'w-3 h-3 rounded-full',
-                          status === 'owned' && 'bg-status-owned',
-                          status === 'located' && 'bg-status-located',
-                          status === 'missing' && 'bg-status-missing',
-                          status === 'none' && 'bg-muted/30'
-                        )}
-                        title={`${slot}: ${status}`}
-                      />
-                    </div>
-                  );
-                })}
-
-                <span className={cn(
-                  'text-xs font-medium text-center',
-                  playerPct === 100 ? 'text-status-owned' : playerPct > 0 ? 'text-foreground' : 'text-muted-foreground'
-                )}>
-                  {playerPct.toFixed(0)}%
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }
