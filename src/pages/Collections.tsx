@@ -25,7 +25,6 @@ interface CollectionPlayerRow {
 }
 
 function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: PlayerWithCards[]; cardTagLinks: { card_id: string; tag_id: string }[] }) {
-  const [expanded, setExpanded] = useState(false);
 
   const { rows, stats } = useMemo(() => {
     const rows: CollectionPlayerRow[] = [];
