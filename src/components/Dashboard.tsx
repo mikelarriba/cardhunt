@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2 } from 'lucide-react';
+import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { VirtualPlayerGrid } from './VirtualPlayerGrid';
