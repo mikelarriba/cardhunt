@@ -173,6 +173,11 @@ export function Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Button variant="ghost" size="icon" asChild title="Collections">
+                <Link to="/collections">
+                  <FolderOpen className="w-5 h-5" />
+                </Link>
+              </Button>
               <Button variant="ghost" size="icon" asChild title="Sellers">
                 <Link to="/sellers">
                   <Store className="w-5 h-5" />
