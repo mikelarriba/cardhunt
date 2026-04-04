@@ -307,7 +307,7 @@ export function AddCardModal({
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={cardLabels.length === 0 || createCard.isPending}
+            disabled={!hasPrimarySlot || createCard.isPending}
           >
             {createCard.isPending ? 'Adding...' : 'Add Card'}
           </Button>
