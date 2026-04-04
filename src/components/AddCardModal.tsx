@@ -66,9 +66,12 @@ export function AddCardModal({
     new Set(existingCards.flatMap(c => c.card_labels || []))
   );
 
+  const PRIMARY_SLOTS = ['Rookie', 'Autographed', 'Base'];
+  const hasPrimarySlot = cardLabels.some(l => PRIMARY_SLOTS.includes(l));
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (cardLabels.length === 0) return;
+    if (!hasPrimarySlot) return;
 
     const finalBrand = brand === 'custom' ? customBrand : brand;
 
@@ -304,7 +307,7 @@ export function AddCardModal({
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={cardLabels.length === 0 || createCard.isPending}
+            disabled={!hasPrimarySlot || createCard.isPending}
           >
             {createCard.isPending ? 'Adding...' : 'Add Card'}
           </Button>

@@ -4,6 +4,7 @@ import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -26,6 +27,8 @@ interface CollectionFilterBuilderProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+const CARD_TYPE_SLOTS = ['Rookie', 'Autographed', 'Base'] as const;
 
 const FIELD_OPTIONS: { value: FilterCondition['field']; label: string }[] = [
   { value: 'card_team', label: 'Team' },
@@ -202,11 +205,18 @@ function ConditionValueInput({
 
 export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilterBuilderProps) {
   const [name, setName] = useState('');
+  const [selectedCardTypes, setSelectedCardTypes] = useState<string[]>([]);
   const [logic, setLogic] = useState<'and' | 'or'>('and');
   const [conditions, setConditions] = useState<FilterCondition[]>([
     { field: 'card_team', operator: 'equals', value: '' },
   ]);
   const { createTag } = useTags();
+
+  const toggleCardType = (type: string) => {
+    setSelectedCardTypes(prev =>
+      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
+    );
+  };
 
   const addCondition = () => {
     setConditions([...conditions, { field: 'card_team', operator: 'equals', value: '' }]);
@@ -220,7 +230,6 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
     setConditions(conditions.map((c, i) => {
       if (i !== index) return c;
       const updated = { ...c, ...updates };
-      // Reset value when field/operator changes
       if (updates.field || updates.operator) {
         updated.value = updates.operator === 'in' ? [] : '';
       }
@@ -229,16 +238,36 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
   };
 
   const handleSubmit = () => {
-    if (!name.trim() || conditions.length === 0) return;
+    if (!name.trim() || selectedCardTypes.length === 0) return;
 
+    // Build conditions: card type condition + additional user conditions
+    const allConditions: FilterCondition[] = [];
+
+    // Add card type condition
+    if (selectedCardTypes.length === 1) {
+      allConditions.push({
+        field: 'card_labels',
+        operator: 'contains',
+        value: selectedCardTypes[0],
+      });
+    } else {
+      allConditions.push({
+        field: 'card_labels',
+        operator: 'in',
+        value: selectedCardTypes,
+      });
+    }
+
+    // Add user-defined conditions
     const validConditions = conditions.filter(c => {
       if (Array.isArray(c.value)) return c.value.length > 0;
       return String(c.value).trim() !== '';
     });
+    allConditions.push(...validConditions);
 
-    if (validConditions.length === 0) return;
-
-    const filterRules: FilterRules = { conditions: validConditions, logic };
+    // If we have card types + additional conditions, use AND logic between them
+    // The card type part uses OR internally (any of the selected types)
+    const filterRules: FilterRules = { conditions: allConditions, logic };
 
     createTag.mutate(
       { name: name.trim(), filterRules },
@@ -246,6 +275,7 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
         onSuccess: () => {
           onOpenChange(false);
           setName('');
+          setSelectedCardTypes([]);
           setLogic('and');
           setConditions([{ field: 'card_team', operator: 'equals', value: '' }]);
         },
@@ -273,6 +303,31 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
               onChange={(e) => setName(e.target.value)}
               className="bg-secondary/50 border-border/50"
             />
+          </div>
+
+          {/* Card Type Selection - Required */}
+          <div className="space-y-3">
+            <Label>Card Types <span className="text-xs text-muted-foreground">(select at least one)</span></Label>
+            <div className="flex gap-3">
+              {CARD_TYPE_SLOTS.map((type) => (
+                <label
+                  key={type}
+                  className={cn(
+                    'flex-1 flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all',
+                    selectedCardTypes.includes(type)
+                      ? 'bg-primary/10 border-primary text-primary'
+                      : 'bg-secondary/50 border-border/50 text-muted-foreground hover:bg-secondary'
+                  )}
+                >
+                  <Checkbox
+                    checked={selectedCardTypes.includes(type)}
+                    onCheckedChange={() => toggleCardType(type)}
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                  <span className="text-sm font-medium">{type}</span>
+                </label>
+              ))}
+            </div>
           </div>
 
           {/* Logic Toggle */}
@@ -306,9 +361,9 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
             </div>
           </div>
 
-          {/* Conditions */}
+          {/* Additional Conditions */}
           <div className="space-y-3">
-            <Label>Conditions</Label>
+            <Label>Additional Conditions <span className="text-xs text-muted-foreground">(optional)</span></Label>
             {conditions.map((cond, i) => (
               <div key={i} className="glass-card p-3 space-y-3">
                 <div className="flex items-center justify-between">
@@ -381,7 +436,7 @@ export function CollectionFilterBuilder({ open, onOpenChange }: CollectionFilter
           <Button
             onClick={handleSubmit}
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            disabled={!name.trim() || createTag.isPending}
+            disabled={!name.trim() || selectedCardTypes.length === 0 || createTag.isPending}
           >
             {createTag.isPending ? 'Creating...' : 'Create Smart Collection'}
           </Button>

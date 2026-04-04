@@ -22,7 +22,9 @@ export function CardLabelsInput({
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Default labels to suggest
-  const defaultLabels = ['Rookie', 'Autographed', 'Numbered', 'Parallel', 'Insert', 'Refractor', 'Prizm', 'Base', 'SP', 'SSP', 'Variation'];
+  // Primary card type slots (at least one required)
+  const primarySlots = ['Rookie', 'Autographed', 'Base'];
+  const defaultLabels = [...primarySlots, 'Numbered', 'Parallel', 'Insert', 'Refractor', 'Prizm', 'SP', 'SSP', 'Variation'];
 
   // Combine default with existing
   const allLabels = useMemo(() => {
