@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowLeft, Sparkles, FolderOpen, ChevronDown, ChevronRight, Wand2, Users } from 'lucide-react';
+import { ArrowLeft, Sparkles, FolderOpen, ChevronRight, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { CollectionFilterBuilder } from '@/components/CollectionFilterBuilder';
