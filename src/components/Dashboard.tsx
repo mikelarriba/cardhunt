@@ -148,7 +148,7 @@ export function Dashboard() {
     if (!selectedTagObj) return [];
     return filteredPlayers.flatMap(p => {
       if (selectedTagObj.filter_rules) {
-        return p.cards.filter(c => cardMatchesRules(c, selectedTagObj.filter_rules!, p.sport));
+        return p.cards.filter(c => cardMatchesRules(c, selectedTagObj.filter_rules!, p.sport, p.teams));
       }
       return p.cards.filter(c => cardTagLinks.some(ct => ct.tag_id === selectedTag && ct.card_id === c.id));
     });
