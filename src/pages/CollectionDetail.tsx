@@ -86,7 +86,7 @@ export default function CollectionDetail() {
     for (const player of players) {
       let matchingCards: Card[];
       if (tag.filter_rules) {
-        matchingCards = player.cards.filter(c => cardMatchesRules(c, tag.filter_rules as FilterRules, player.sport));
+        matchingCards = player.cards.filter(c => cardMatchesRules(c, tag.filter_rules as FilterRules, player.sport, player.teams));
       } else {
         const taggedCardIds = new Set(
           cardTagLinks.filter(ct => ct.tag_id === tag.id).map(ct => ct.card_id)
