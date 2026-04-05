@@ -255,25 +255,31 @@ export type Database = {
       }
       sellers: {
         Row: {
+          combined_shipping: boolean
           created_at: string
           id: string
           name: string
+          shipping_cost: number | null
           updated_at: string
           url: string | null
           user_id: string
         }
         Insert: {
+          combined_shipping?: boolean
           created_at?: string
           id?: string
           name: string
+          shipping_cost?: number | null
           updated_at?: string
           url?: string | null
           user_id: string
         }
         Update: {
+          combined_shipping?: boolean
           created_at?: string
           id?: string
           name?: string
+          shipping_cost?: number | null
           updated_at?: string
           url?: string | null
           user_id?: string
