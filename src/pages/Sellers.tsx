@@ -246,7 +246,9 @@ const Sellers = () => {
                     <TableRow key={seller.id} className="hover:bg-muted/30">
                       <TableCell>
                         <div>
-                          <p className="font-medium">{seller.name}</p>
+                          <Link to={`/seller/${seller.id}`} className="font-medium hover:text-primary transition-colors">
+                            {seller.name}
+                          </Link>
                           {seller.url && (
                             <a
                               href={seller.url}
