@@ -4,14 +4,29 @@ import { Tag, FilterRules, Card } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 // Evaluate whether a card matches smart collection filter rules
-export function cardMatchesRules(card: Card, rules: FilterRules, playerSport?: string): boolean {
+export function cardMatchesRules(card: Card, rules: FilterRules, playerSport?: string, playerTeams?: string[]): boolean {
   const results = rules.conditions.map((cond) => {
     switch (cond.field) {
-      case 'card_team':
-        if (cond.operator === 'equals') return card.card_team?.toLowerCase() === String(cond.value).toLowerCase();
-        if (cond.operator === 'contains') return card.card_team?.toLowerCase().includes(String(cond.value).toLowerCase()) ?? false;
-        if (cond.operator === 'in') return Array.isArray(cond.value) && cond.value.some(v => card.card_team?.toLowerCase() === v.toLowerCase());
+      case 'card_team': {
+        // Check card_team first, fall back to player teams
+        const cardTeam = card.card_team?.toLowerCase();
+        const pTeams = (playerTeams || []).map(t => t.toLowerCase());
+        if (cond.operator === 'equals') {
+          const val = String(cond.value).toLowerCase();
+          return cardTeam === val || pTeams.some(t => t === val);
+        }
+        if (cond.operator === 'contains') {
+          const val = String(cond.value).toLowerCase();
+          return (cardTeam?.includes(val) ?? false) || pTeams.some(t => t.includes(val));
+        }
+        if (cond.operator === 'in') {
+          return Array.isArray(cond.value) && cond.value.some(v => {
+            const val = v.toLowerCase();
+            return cardTeam === val || pTeams.some(t => t === val);
+          });
+        }
         return false;
+      }
       case 'card_labels':
         if (cond.operator === 'contains') return card.card_labels?.some(l => l.toLowerCase() === String(cond.value).toLowerCase()) ?? false;
         if (cond.operator === 'in') return Array.isArray(cond.value) && cond.value.some(v => card.card_labels?.some(l => l.toLowerCase() === v.toLowerCase()));
