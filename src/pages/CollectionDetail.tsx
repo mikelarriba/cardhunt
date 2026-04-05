@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
   ArrowLeft, Sparkles, FolderOpen, Pencil, Trash2, Plus, UserMinus,
+  ChevronDown, ChevronRight, ExternalLink, Hash,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -66,6 +67,190 @@ function StatsRing({ value, size = 64, strokeWidth = 5, label, color }: {
   );
 }
 
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span className={cn(
+      'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider',
+      status === 'owned' && 'bg-status-owned/15 text-status-owned',
+      status === 'located' && 'bg-status-located/15 text-status-located',
+      status === 'missing' && 'bg-status-missing/15 text-status-missing',
+    )}>
+      {status}
+    </span>
+  );
+}
+
+function CardRow({ card, playerName }: { card: Card; playerName: string }) {
+  const labels = card.card_labels || [];
+  const hasImage = card.image_front || card.image_url;
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/20 transition-colors border-b border-border/10 last:border-b-0">
+      {/* Thumbnail */}
+      <div className="w-10 h-14 rounded bg-muted/50 flex-shrink-0 overflow-hidden">
+        {hasImage ? (
+          <img
+            src={card.image_front || card.image_url || ''}
+            alt={`${playerName} card`}
+            className="w-full h-full object-cover rounded"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
+            <Hash className="w-4 h-4" />
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          {labels.map(l => (
+            <span key={l} className={cn(
+              'text-[10px] font-medium px-1.5 py-0.5 rounded',
+              l.toLowerCase() === 'rookie' && 'bg-primary/10 text-primary',
+              l.toLowerCase() === 'autographed' && 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+              l.toLowerCase() === 'base' && 'bg-secondary text-muted-foreground',
+              !['rookie', 'autographed', 'base'].includes(l.toLowerCase()) && 'bg-secondary text-muted-foreground',
+            )}>
+              {l}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+          {card.brand && <span>{card.brand}</span>}
+          {card.brand && card.series && <span>·</span>}
+          {card.series && <span>{card.series}</span>}
+          {card.card_year && <span>· {card.card_year}</span>}
+          {card.is_numbered && card.serial_num != null && card.serial_total != null && (
+            <span className="text-primary font-mono">#{card.serial_num}/{card.serial_total}</span>
+          )}
+        </div>
+        {card.seller && (
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            Seller: {card.seller}
+          </p>
+        )}
+      </div>
+
+      {/* Status + Price */}
+      <div className="flex items-center gap-3 flex-shrink-0">
+        {card.price != null && (
+          <span className="text-sm font-medium text-foreground">${card.price.toFixed(2)}</span>
+        )}
+        <StatusBadge status={card.status} />
+        {card.source_url && (
+          <a href={card.source_url} target="_blank" rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors">
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PlayerSection({ player, matchingCards, isSmart, tagId, onRemove }: {
+  player: PlayerWithCards;
+  matchingCards: Card[];
+  isSmart: boolean;
+  tagId: string;
+  onRemove: () => void;
+}) {
+  const [expanded, setExpanded] = useState(true);
+
+  const ownedCount = matchingCards.filter(c => c.status === 'owned').length;
+  const locatedCount = matchingCards.filter(c => c.status === 'located').length;
+  const missingCount = matchingCards.length - ownedCount - locatedCount;
+  const pct = matchingCards.length > 0 ? (ownedCount / matchingCards.length) * 100 : 0;
+
+  // Sort cards: Rookie first, Autographed second, Base third, then by status
+  const sortedCards = [...matchingCards].sort((a, b) => {
+    const slotOrder = (c: Card) => {
+      if (cardHasSlot(c, 'Rookie')) return 0;
+      if (cardHasSlot(c, 'Autographed')) return 1;
+      if (cardHasSlot(c, 'Base')) return 2;
+      return 3;
+    };
+    const statusOrder: Record<string, number> = { owned: 0, located: 1, missing: 2 };
+    const slotDiff = slotOrder(a) - slotOrder(b);
+    if (slotDiff !== 0) return slotDiff;
+    return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
+  });
+
+  return (
+    <div className="glass-card overflow-hidden">
+      {/* Player header */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/20 transition-colors"
+      >
+        {expanded ? <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />}
+
+        <Link
+          to={`/player/${player.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className="font-display font-semibold text-foreground hover:text-primary transition-colors truncate"
+        >
+          {player.name}
+        </Link>
+        <SportBadge sport={player.sport} />
+
+        <div className="ml-auto flex items-center gap-3 flex-shrink-0">
+          {/* Slot dots */}
+          <div className="flex items-center gap-1.5">
+            {CARD_SLOTS.map(slot => {
+              const slotCards = matchingCards.filter(c => cardHasSlot(c, slot));
+              let dotStatus = 'none';
+              if (slotCards.length > 0) {
+                if (slotCards.some(c => c.status === 'owned')) dotStatus = 'owned';
+                else if (slotCards.some(c => c.status === 'located')) dotStatus = 'located';
+                else dotStatus = 'missing';
+              }
+              return (
+                <div key={slot} className={cn(
+                  'w-2.5 h-2.5 rounded-full',
+                  dotStatus === 'owned' && 'bg-status-owned',
+                  dotStatus === 'located' && 'bg-status-located',
+                  dotStatus === 'missing' && 'bg-status-missing',
+                  dotStatus === 'none' && 'bg-muted/30',
+                )} title={`${slot}: ${dotStatus}`} />
+              );
+            })}
+          </div>
+
+          <span className={cn(
+            'text-sm font-medium min-w-[40px] text-right',
+            pct === 100 ? 'text-status-owned' : pct > 0 ? 'text-foreground' : 'text-muted-foreground',
+          )}>
+            {pct.toFixed(0)}%
+          </span>
+
+          {!isSmart && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+              onClick={(e) => { e.stopPropagation(); onRemove(); }}
+              title="Remove from collection"
+            >
+              <UserMinus className="w-3.5 h-3.5" />
+            </Button>
+          )}
+        </div>
+      </button>
+
+      {/* Cards list */}
+      {expanded && (
+        <div className="border-t border-border/20">
+          {sortedCards.map(card => (
+            <CardRow key={card.id} card={card} playerName={player.name} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CollectionDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -120,7 +305,6 @@ export default function CollectionDetail() {
     };
   }, [tag, players, cardTagLinks]);
 
-  // Players NOT in the collection (for manual add)
   const availablePlayers = useMemo(() => {
     if (!tag) return [];
     const inCollectionIds = new Set(rows.map(r => r.player.id));
@@ -130,7 +314,6 @@ export default function CollectionDetail() {
   const handleAddPlayer = (playerId: string) => {
     const player = players.find(p => p.id === playerId);
     if (!player || !tag) return;
-    // Add all of the player's cards to this collection via card_tags
     player.cards.forEach(card => {
       addCardTag.mutate({ cardId: card.id, tagId: tag.id });
     });
@@ -139,7 +322,6 @@ export default function CollectionDetail() {
 
   const handleRemovePlayer = (player: PlayerWithCards) => {
     if (!tag) return;
-    // Remove all card_tags for this player's cards
     player.cards.forEach(card => {
       removeCardTag.mutate({ cardId: card.id, tagId: tag.id });
     });
@@ -257,7 +439,6 @@ export default function CollectionDetail() {
             <StatsRing value={stats.total > 0 ? ((stats.missing) / stats.total) * 100 : 0} label="Missing" color="hsl(var(--status-missing))" />
           </div>
 
-          {/* Overall progress bar */}
           <div className="mt-4">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
               <span>{stats.owned} owned</span>
@@ -300,83 +481,25 @@ export default function CollectionDetail() {
           ))}
         </div>
 
-        {/* Player Table */}
-        <div className="glass-card overflow-hidden">
-          <div className="grid grid-cols-[1fr_70px_70px_70px_60px_40px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wider text-muted-foreground font-medium border-b border-border/20">
-            <span>Player</span>
-            {CARD_SLOTS.map(s => <span key={s} className="text-center">{s}</span>)}
-            <span className="text-center">%</span>
-            <span />
+        {/* Player Sections with Cards */}
+        {rows.length === 0 ? (
+          <div className="glass-card p-8 text-center text-muted-foreground">
+            <p>No players match this collection yet.</p>
           </div>
-
-          {rows.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              <p>No players match this collection yet.</p>
-            </div>
-          ) : (
-            rows.map(({ player, matchingCards }) => {
-              const slotStatuses = CARD_SLOTS.map(slot => {
-                const slotCards = matchingCards.filter(c => cardHasSlot(c, slot));
-                if (slotCards.length === 0) return 'none';
-                if (slotCards.some(c => c.status === 'owned')) return 'owned';
-                if (slotCards.some(c => c.status === 'located')) return 'located';
-                return 'missing';
-              });
-
-              const ownedSlots = slotStatuses.filter(s => s === 'owned').length;
-              const activeSlots = slotStatuses.filter(s => s !== 'none').length;
-              const playerPct = activeSlots > 0 ? (ownedSlots / activeSlots) * 100 : 0;
-
-              return (
-                <div
-                  key={player.id}
-                  className="grid grid-cols-[1fr_70px_70px_70px_60px_40px] gap-2 px-4 py-3 hover:bg-secondary/30 transition-colors items-center"
-                >
-                  <Link to={`/player/${player.id}`} className="flex items-center gap-2 min-w-0">
-                    <span className="font-medium text-sm text-foreground truncate hover:text-primary transition-colors">{player.name}</span>
-                    <SportBadge sport={player.sport} />
-                  </Link>
-
-                  {CARD_SLOTS.map((slot, i) => {
-                    const status = slotStatuses[i];
-                    return (
-                      <div key={slot} className="flex justify-center">
-                        <div className={cn(
-                          'w-3 h-3 rounded-full',
-                          status === 'owned' && 'bg-status-owned',
-                          status === 'located' && 'bg-status-located',
-                          status === 'missing' && 'bg-status-missing',
-                          status === 'none' && 'bg-muted/30'
-                        )} title={`${slot}: ${status}`} />
-                      </div>
-                    );
-                  })}
-
-                  <span className={cn(
-                    'text-xs font-medium text-center',
-                    playerPct === 100 ? 'text-status-owned' : playerPct > 0 ? 'text-foreground' : 'text-muted-foreground'
-                  )}>
-                    {playerPct.toFixed(0)}%
-                  </span>
-
-                  {/* Remove player (manual collections only) */}
-                  {!isSmart && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleRemovePlayer(player)}
-                      title="Remove from collection"
-                    >
-                      <UserMinus className="w-3.5 h-3.5" />
-                    </Button>
-                  )}
-                  {isSmart && <div />}
-                </div>
-              );
-            })
-          )}
-        </div>
+        ) : (
+          <div className="space-y-3">
+            {rows.map(({ player, matchingCards }) => (
+              <PlayerSection
+                key={player.id}
+                player={player}
+                matchingCards={matchingCards}
+                isSmart={isSmart}
+                tagId={tag.id}
+                onRemove={() => handleRemovePlayer(player)}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Add Player for manual collections */}
         {showAddPlayer && !isSmart && (
