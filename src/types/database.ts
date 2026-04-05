@@ -79,6 +79,8 @@ export interface Seller {
   user_id: string;
   name: string;
   url: string | null;
+  combined_shipping: boolean;
+  shipping_cost: number | null;
   created_at: string;
   updated_at: string;
 }
