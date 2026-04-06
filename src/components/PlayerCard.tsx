@@ -42,6 +42,7 @@ function getPlaceholderImageUrl(name: string): string {
 }
 
 export function PlayerCard({ player }: PlayerCardProps) {
+  const [showAddCard, setShowAddCard] = useState(false);
   const queryClient = useQueryClient();
   const deletePlayer = useMutation({
     mutationFn: async (playerId: string) => {
