@@ -11,10 +11,11 @@ import { EditPlayerModal } from '@/components/EditPlayerModal';
 import { TeamPillList } from '@/components/TeamPill';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LiveMarketSection } from '@/components/LiveMarketSection';
+import { PlayerShowcase, getShowcaseCardIds } from '@/components/PlayerShowcase';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 export default function PlayerDetail() {
   const { id } = useParams<{ id: string }>();
@@ -145,10 +146,13 @@ export default function PlayerDetail() {
           </div>
         </div>
 
+        {/* Showcase Section */}
+        <PlayerShowcase cards={player.cards} sport={player.sport} />
+
         {/* Tabs for Cards and Live Market */}
-        <Tabs defaultValue="cards" className="space-y-6">
+        <Tabs defaultValue="cards" className="space-y-6 mt-8">
           <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="cards">My Cards</TabsTrigger>
+            <TabsTrigger value="cards">General Collection</TabsTrigger>
             <TabsTrigger value="market">Live Market</TabsTrigger>
           </TabsList>
 
