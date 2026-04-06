@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { TeamAutocomplete } from '@/components/TeamAutocomplete';
-import { Calendar, Users, Store } from 'lucide-react';
+import { Calendar, Users, Store, Star } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
