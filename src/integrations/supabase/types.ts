@@ -114,6 +114,7 @@ export type Database = {
           image_back: string | null
           image_front: string | null
           image_url: string | null
+          is_favorite: boolean
           is_numbered: boolean | null
           notes: string | null
           player_id: string
@@ -139,6 +140,7 @@ export type Database = {
           image_back?: string | null
           image_front?: string | null
           image_url?: string | null
+          is_favorite?: boolean
           is_numbered?: boolean | null
           notes?: string | null
           player_id: string
@@ -164,6 +166,7 @@ export type Database = {
           image_back?: string | null
           image_front?: string | null
           image_url?: string | null
+          is_favorite?: boolean
           is_numbered?: boolean | null
           notes?: string | null
           player_id?: string
