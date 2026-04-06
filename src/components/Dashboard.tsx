@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2, FolderOpen } from 'lucide-react';
+import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2, FolderOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { VirtualPlayerGrid } from './VirtualPlayerGrid';
@@ -22,6 +22,7 @@ import { SportType, CardStatus } from '@/types/database';
 export function Dashboard() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSmartBuilder, setShowSmartBuilder] = useState(false);
+  const [showStats, setShowStats] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSport, setSelectedSport] = useState<SportType | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CardStatus | 'all'>('all');
@@ -202,42 +203,51 @@ export function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-6">
-        {/* Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <div className="glass-card p-4 text-center">
-            <p className="text-2xl font-display font-bold text-foreground">
-              {stats.totalPlayers}
-            </p>
-            <p className="text-xs text-muted-foreground">Players</p>
-          </div>
-          <div className="glass-card p-4 text-center">
-            <p className="text-2xl font-display font-bold text-status-owned">
-              {stats.ownedCards}
-            </p>
-            <p className="text-xs text-muted-foreground">Owned</p>
-          </div>
-          <div className="glass-card p-4 text-center">
-            <p className="text-2xl font-display font-bold text-status-located">
-              {stats.locatedCards}
-            </p>
-            <p className="text-xs text-muted-foreground">Located</p>
-          </div>
-          <div className="glass-card p-4 text-center">
-            <p className="text-2xl font-display font-bold text-status-missing">
-              {stats.missingCards}
-            </p>
-            <p className="text-xs text-muted-foreground">Missing</p>
-          </div>
-          <div className="glass-card p-4 text-center col-span-2 md:col-span-1">
-            <p className="text-2xl font-display font-bold text-primary">
-              ${stats.totalValue.toFixed(0)}
-            </p>
-            <p className="text-xs text-muted-foreground">Collection Value</p>
-          </div>
-        </div>
+        {/* Collapsible Stats & Filters */}
+        <div className="mb-4">
+          <button
+            onClick={() => setShowStats(prev => !prev)}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
+          >
+            {showStats ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="font-medium">
+              {showStats ? 'Hide' : 'Show'} Stats & Filters
+            </span>
+            {!showStats && (
+              <span className="text-xs opacity-70">
+                — {stats.totalPlayers} players · {stats.ownedCards} owned · ${stats.totalValue.toFixed(0)}
+              </span>
+            )}
+          </button>
 
-        {/* TOP: Global Search & Filter Bar */}
-        <SearchFilterBar
+          {showStats && (
+            <div className="space-y-3 animate-fade-in">
+              {/* Compact Stats Bar */}
+              <div className="grid grid-cols-5 gap-2">
+                <div className="glass-card px-3 py-2 text-center">
+                  <p className="text-lg font-display font-bold text-foreground">{stats.totalPlayers}</p>
+                  <p className="text-[10px] text-muted-foreground">Players</p>
+                </div>
+                <div className="glass-card px-3 py-2 text-center">
+                  <p className="text-lg font-display font-bold text-status-owned">{stats.ownedCards}</p>
+                  <p className="text-[10px] text-muted-foreground">Owned</p>
+                </div>
+                <div className="glass-card px-3 py-2 text-center">
+                  <p className="text-lg font-display font-bold text-status-located">{stats.locatedCards}</p>
+                  <p className="text-[10px] text-muted-foreground">Located</p>
+                </div>
+                <div className="glass-card px-3 py-2 text-center">
+                  <p className="text-lg font-display font-bold text-status-missing">{stats.missingCards}</p>
+                  <p className="text-[10px] text-muted-foreground">Missing</p>
+                </div>
+                <div className="glass-card px-3 py-2 text-center">
+                  <p className="text-lg font-display font-bold text-primary">${stats.totalValue.toFixed(0)}</p>
+                  <p className="text-[10px] text-muted-foreground">Value</p>
+                </div>
+              </div>
+
+              {/* Search & Filter Bar */}
+              <SearchFilterBar
           searchQuery={searchQuery}
           selectedSport={selectedSport}
           selectedStatus={selectedStatus}
@@ -249,9 +259,12 @@ export function Dashboard() {
           onStatusChange={setSelectedStatus}
           onTagChange={setSelectedTag}
           onTeamChange={setSelectedTeam}
-          onClearFilters={clearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
+                onClearFilters={clearFilters}
+                hasActiveFilters={hasActiveFilters}
+              />
+            </div>
+          )}
+        </div>
 
         {/* MIDDLE: View Switcher */}
         <div className="flex items-center justify-between mb-6">
