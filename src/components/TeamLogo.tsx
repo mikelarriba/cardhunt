@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { TEAM_COLORS, SportType } from '@/types/database';
-import { useTeamLogo } from '@/hooks/useTeamLogo';
+import { useTeamLogos } from '@/hooks/useTeamLogos';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface TeamLogoProps {
   teamName: string;
@@ -12,7 +11,7 @@ interface TeamLogoProps {
 
 export function TeamLogo({ teamName, sport, size = 'md' }: TeamLogoProps) {
   const [imageError, setImageError] = useState(false);
-  const { logoUrl, isLoading } = useTeamLogo(teamName, sport);
+  const { logoMap, isLoading } = useTeamLogos();
   
   const sizeClasses = {
     sm: 'w-5 h-5 text-[8px]',
@@ -20,7 +19,6 @@ export function TeamLogo({ teamName, sport, size = 'md' }: TeamLogoProps) {
     lg: 'w-8 h-8 text-xs',
   };
 
-  // Get team initials for fallback
   const getInitials = (name: string) => {
     const words = name.split(' ');
     if (words.length >= 2) {
@@ -29,12 +27,10 @@ export function TeamLogo({ teamName, sport, size = 'md' }: TeamLogoProps) {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Get team color or generate one from the name
   const getTeamColor = (name: string) => {
     if (TEAM_COLORS[name]) {
       return TEAM_COLORS[name];
     }
-    // Generate a consistent color from the team name
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -45,17 +41,14 @@ export function TeamLogo({ teamName, sport, size = 'md' }: TeamLogoProps) {
 
   const initials = getInitials(teamName);
   const teamColor = getTeamColor(teamName);
+  const logoUrl = logoMap.get(`${teamName}::${sport}`) ?? null;
 
-  // Show skeleton while loading
   if (isLoading) {
     return (
-      <Skeleton 
-        className={cn('rounded-full shrink-0', sizeClasses[size])} 
-      />
+      <div className={cn('rounded-full shrink-0 bg-muted animate-pulse', sizeClasses[size])} />
     );
   }
 
-  // Show fallback initials if no logo or error
   if (!logoUrl || imageError) {
     return (
       <div
