@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { TeamAutocomplete } from '@/components/TeamAutocomplete';
 import { Calendar, Users, Store } from 'lucide-react';
 import {
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardStatus, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { useCards } from '@/hooks/useCards';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { DualImageUpload } from './DualImageUpload';
 import { SerialNumberInput } from './SerialNumberInput';
@@ -45,8 +46,19 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
   const [cardYear, setCardYear] = useState(card.card_year?.toString() || '');
   const [cardTeam, setCardTeam] = useState(card.card_team || '');
   const [seller, setSeller] = useState(card.seller || '');
+  const [isFavorite, setIsFavorite] = useState(card.is_favorite || false);
 
   const { updateCard } = useCards();
+
+  // Determine which showcase slots this card can be favorite for
+  const showcaseSlots = useMemo(() => {
+    const labels = card.card_labels || [];
+    const slots: string[] = [];
+    if (labels.some(l => l.toLowerCase() === 'rookie')) slots.push('Rookie');
+    if (labels.some(l => l.toLowerCase() === 'autographed')) slots.push('Autographed');
+    if (labels.some(l => l.toLowerCase() === 'base')) slots.push('Base');
+    return slots;
+  }, [card.card_labels]);
 
   useEffect(() => {
     if (open) {
@@ -64,6 +76,7 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
       setCardYear(card.card_year?.toString() || '');
       setCardTeam(card.card_team || '');
       setSeller(card.seller || '');
+      setIsFavorite(card.is_favorite || false);
     }
   }, [open, card]);
 
