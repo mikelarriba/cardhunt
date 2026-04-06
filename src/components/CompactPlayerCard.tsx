@@ -16,10 +16,14 @@ function getPlayerStatus(player: PlayerWithCards): 'owned' | 'located' | 'missin
   return 'missing';
 }
 
-// Generate placeholder image URL based on player name
+// Generate placeholder image URL showing the full player name
 function getPlaceholderImageUrl(name: string): string {
-  const seed = encodeURIComponent(name);
-  return `https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=1a1a2e&textColor=fbbf24`;
+  const lines = name.split(' ');
+  const textElements = lines.map((line, i) => {
+    const y = 50 + (i - (lines.length - 1) / 2) * 14;
+    return `<text x="50" y="${y}" font-family="system-ui,sans-serif" font-size="11" fill="%23fbbf24" text-anchor="middle" dominant-baseline="central">${encodeURIComponent(line)}</text>`;
+  }).join('');
+  return `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%231a1a2e"/>${textElements}</svg>`;
 }
 
 export function CompactPlayerCard({ player }: CompactPlayerCardProps) {
