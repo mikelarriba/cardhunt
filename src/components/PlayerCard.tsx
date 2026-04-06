@@ -13,7 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { usePlayers } from '@/hooks/usePlayers';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 interface PlayerCardProps {
@@ -42,7 +43,16 @@ function getPlaceholderImageUrl(name: string): string {
 
 export function PlayerCard({ player }: PlayerCardProps) {
   const [showAddCard, setShowAddCard] = useState(false);
-  const { deletePlayer } = usePlayers();
+  const queryClient = useQueryClient();
+  const deletePlayer = useMutation({
+    mutationFn: async (playerId: string) => {
+      const { error } = await supabase.from('players').delete().eq('id', playerId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+    },
+  });
   const navigate = useNavigate();
 
   const playerStatus = getPlayerStatus(player);
