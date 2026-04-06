@@ -80,11 +80,38 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
     }
   }, [open, card]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cardLabels.length === 0) return;
 
     const finalBrand = brand === 'custom' ? customBrand : brand;
+
+    // If setting as favorite, unmark other favorites of the same slot types for this player
+    if (isFavorite && showcaseSlots.length > 0) {
+      // Find all cards for this player with the same slot labels that are currently favorites
+      const { data: siblingCards } = await supabase
+        .from('cards')
+        .select('id, card_labels')
+        .eq('player_id', card.player_id)
+        .eq('is_favorite', true)
+        .neq('id', card.id);
+
+      if (siblingCards) {
+        const idsToUnfavorite = siblingCards
+          .filter(sc => {
+            const labels = (sc.card_labels || []).map((l: string) => l.toLowerCase());
+            return showcaseSlots.some(slot => labels.includes(slot.toLowerCase()));
+          })
+          .map(sc => sc.id);
+
+        if (idsToUnfavorite.length > 0) {
+          await supabase
+            .from('cards')
+            .update({ is_favorite: false })
+            .in('id', idsToUnfavorite);
+        }
+      }
+    }
 
     updateCard.mutate(
       {
@@ -103,6 +130,7 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
           card_year: cardYear ? parseInt(cardYear) : null,
           card_team: cardTeam || null,
           seller: seller || null,
+          is_favorite: isFavorite,
         },
       },
       {
@@ -276,6 +304,34 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
             </div>
           </div>
 
+
+          {/* Showcase Favorite Toggle */}
+          {showcaseSlots.length > 0 && (
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-primary" />
+                Showcase Favorite
+              </Label>
+              <button
+                type="button"
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={cn(
+                  'w-full py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2',
+                  isFavorite
+                    ? 'bg-primary/20 text-primary ring-1 ring-primary'
+                    : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
+                )}
+              >
+                <Star className={cn('w-4 h-4', isFavorite && 'fill-current')} />
+                {isFavorite
+                  ? `Showcase favorite for: ${showcaseSlots.join(', ')}`
+                  : `Set as Showcase Favorite for ${showcaseSlots.join(' / ')}`}
+              </button>
+              <p className="text-xs text-muted-foreground">
+                Setting this will replace any existing favorite of the same type for this player.
+              </p>
+            </div>
+          )}
 
           {/* Notes */}
           <div className="space-y-2">
