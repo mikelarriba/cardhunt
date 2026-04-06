@@ -72,6 +72,7 @@ export interface Card {
   card_year: number | null;
   card_team: string | null;
   seller: string | null;
+  is_favorite: boolean;
 }
 
 export interface Seller {
