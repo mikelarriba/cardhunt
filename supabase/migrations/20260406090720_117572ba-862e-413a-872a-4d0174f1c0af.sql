@@ -1,0 +1,1 @@
+ALTER TABLE public.cards ADD COLUMN is_favorite boolean NOT NULL DEFAULT false;

@@ -84,6 +84,7 @@ export function useCards() {
         card_year: number | null;
         card_team: string | null;
         seller: string | null;
+        is_favorite: boolean;
       }>;
     }) => {
       const { data, error } = await supabase
