@@ -42,8 +42,16 @@ function getPlaceholderImageUrl(name: string): string {
 }
 
 export function PlayerCard({ player }: PlayerCardProps) {
-  const [showAddCard, setShowAddCard] = useState(false);
-  const { deletePlayer } = usePlayers();
+  const queryClient = useQueryClient();
+  const deletePlayer = useMutation({
+    mutationFn: async (playerId: string) => {
+      const { error } = await supabase.from('players').delete().eq('id', playerId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+    },
+  });
   const navigate = useNavigate();
 
   const playerStatus = getPlayerStatus(player);
