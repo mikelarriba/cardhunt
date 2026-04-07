@@ -77,7 +77,12 @@ export function getShowcaseCardIds(cards: Card[]): Set<string> {
   const ids = new Set<string>();
   SHOWCASE_SLOTS.forEach(slot => {
     const fav = cards.find(c => c.is_favorite && cardMatchesSlot(c, slot));
-    if (fav) ids.add(fav.id);
+    if (fav) { ids.add(fav.id); return; }
+    const matching = cards.filter(c => cardMatchesSlot(c, slot));
+    if (matching.length > 0) {
+      const withPrice = matching.filter(c => c.price != null).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      ids.add((withPrice[0] || matching[0]).id);
+    }
   });
   return ids;
 }
