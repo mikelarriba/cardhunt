@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.search-ebay]
 verify_jwt = false
+
+[functions.ebay-deletion-callback]
+verify_jwt = false
