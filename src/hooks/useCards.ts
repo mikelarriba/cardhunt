@@ -69,6 +69,10 @@ export function useCards() {
         .single();
 
       if (error) throw error;
+
+      // Auto-assign card team to player
+      await autoAssignTeamToPlayer(card.player_id, card.card_team);
+
       return data;
     },
     onSuccess: () => {
@@ -122,6 +126,12 @@ export function useCards() {
         .single();
 
       if (error) throw error;
+
+      // Auto-assign card team to player
+      if (updates.card_team && data.player_id) {
+        await autoAssignTeamToPlayer(data.player_id, updates.card_team);
+      }
+
       return data;
     },
     onSuccess: () => {
