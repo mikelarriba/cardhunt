@@ -25,9 +25,17 @@ export function PlayerShowcase({ cards, sport }: PlayerShowcaseProps) {
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 
   const showcaseCards = SHOWCASE_SLOTS.map(slot => {
-    // Find favorite first
+    // 1. Favorite for this slot
     const favorite = cards.find(c => c.is_favorite && cardMatchesSlot(c, slot));
-    return { slot, card: favorite || null };
+    if (favorite) return { slot, card: favorite };
+    // 2. Cheapest card matching the slot
+    const matching = cards.filter(c => cardMatchesSlot(c, slot));
+    if (matching.length > 0) {
+      const withPrice = matching.filter(c => c.price != null).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      return { slot, card: withPrice[0] || matching[0] };
+    }
+    // 3. No match at all
+    return { slot, card: null };
   });
 
   // Cards NOT in showcase
@@ -69,7 +77,12 @@ export function getShowcaseCardIds(cards: Card[]): Set<string> {
   const ids = new Set<string>();
   SHOWCASE_SLOTS.forEach(slot => {
     const fav = cards.find(c => c.is_favorite && cardMatchesSlot(c, slot));
-    if (fav) ids.add(fav.id);
+    if (fav) { ids.add(fav.id); return; }
+    const matching = cards.filter(c => cardMatchesSlot(c, slot));
+    if (matching.length > 0) {
+      const withPrice = matching.filter(c => c.price != null).sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
+      ids.add((withPrice[0] || matching[0]).id);
+    }
   });
   return ids;
 }
