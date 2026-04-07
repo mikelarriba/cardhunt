@@ -78,6 +78,7 @@ export function useCards() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
       queryClient.invalidateQueries({ queryKey: ['player'] });
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
       toast({
         title: 'Card Added',
         description: 'The card has been added to your collection.',
