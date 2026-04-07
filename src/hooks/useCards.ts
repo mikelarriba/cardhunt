@@ -138,6 +138,7 @@ export function useCards() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
       queryClient.invalidateQueries({ queryKey: ['player'] });
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
       toast({
         title: 'Card Updated',
         description: 'The card has been updated.',
