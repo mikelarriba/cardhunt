@@ -215,6 +215,9 @@ export default function SellerDetail() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Button variant="outline" size="sm" onClick={() => setShowAddCard(true)}>
+                <Plus className="w-4 h-4 mr-2" /> Add Card
+              </Button>
               <Button variant="outline" size="sm" onClick={openEdit}>
                 <Pencil className="w-4 h-4 mr-2" /> Edit
               </Button>
