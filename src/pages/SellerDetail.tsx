@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
-  ArrowLeft, Store, ExternalLink, Pencil, Trash2, Hash,
+  ArrowLeft, Store, ExternalLink, Pencil, Trash2, Hash, Plus,
   Package, DollarSign, Truck, ShoppingCart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Card, BuyOption, PlayerWithCards } from '@/types/database';
+import { AddCardFromSellerModal } from '@/components/AddCardFromSellerModal';
 
 function StatusBadge({ status }: { status: string }) {
   return (
@@ -62,6 +63,7 @@ export default function SellerDetail() {
   const { players, isLoading: playersLoading } = usePlayers();
 
   const [showEdit, setShowEdit] = useState(false);
+  const [showAddCard, setShowAddCard] = useState(false);
   const [formName, setFormName] = useState('');
   const [formUrl, setFormUrl] = useState('');
   const [formCombinedShipping, setFormCombinedShipping] = useState(false);
@@ -213,6 +215,9 @@ export default function SellerDetail() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <Button variant="outline" size="sm" onClick={() => setShowAddCard(true)}>
+                <Plus className="w-4 h-4 mr-2" /> Add Card
+              </Button>
               <Button variant="outline" size="sm" onClick={openEdit}>
                 <Pencil className="w-4 h-4 mr-2" /> Edit
               </Button>
@@ -440,6 +445,14 @@ export default function SellerDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Add Card from Seller */}
+      {seller && (
+        <AddCardFromSellerModal
+          open={showAddCard}
+          onOpenChange={setShowAddCard}
+          sellerName={seller.name}
+        />
+      )}
     </div>
   );
 }
