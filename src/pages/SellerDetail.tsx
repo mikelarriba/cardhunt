@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
-  ArrowLeft, Store, ExternalLink, Pencil, Trash2, Hash,
+  ArrowLeft, Store, ExternalLink, Pencil, Trash2, Hash, Plus,
   Package, DollarSign, Truck, ShoppingCart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
