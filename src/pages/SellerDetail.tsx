@@ -63,6 +63,7 @@ export default function SellerDetail() {
   const { players, isLoading: playersLoading } = usePlayers();
 
   const [showEdit, setShowEdit] = useState(false);
+  const [showAddCard, setShowAddCard] = useState(false);
   const [formName, setFormName] = useState('');
   const [formUrl, setFormUrl] = useState('');
   const [formCombinedShipping, setFormCombinedShipping] = useState(false);
