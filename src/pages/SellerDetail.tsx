@@ -445,6 +445,14 @@ export default function SellerDetail() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Add Card from Seller */}
+      {seller && (
+        <AddCardFromSellerModal
+          open={showAddCard}
+          onOpenChange={setShowAddCard}
+          sellerName={seller.name}
+        />
+      )}
     </div>
   );
 }
