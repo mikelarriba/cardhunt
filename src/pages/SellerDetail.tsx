@@ -34,6 +34,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Card, BuyOption, PlayerWithCards } from '@/types/database';
+import { AddCardFromSellerModal } from '@/components/AddCardFromSellerModal';
 
 function StatusBadge({ status }: { status: string }) {
   return (
