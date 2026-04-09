@@ -87,7 +87,7 @@ export function useCards() {
         action: React.createElement(ToastAction, {
           altText: 'View player',
           onClick: () => { window.location.href = `/player/${variables.player_id}`; },
-        }, 'View Player'),
+        } as any, 'View Player') as any,
       });
     },
     onError: (error) => {

@@ -70,7 +70,7 @@ export function usePlayers() {
         action: React.createElement(ToastAction, {
           altText: 'View player',
           onClick: () => { window.location.href = `/player/${data.id}`; },
-        }, 'View Player'),
+        } as any, 'View Player') as any,
       });
     },
     onError: (error) => {
