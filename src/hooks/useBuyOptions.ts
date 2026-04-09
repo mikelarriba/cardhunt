@@ -59,6 +59,8 @@ export function useBuyOptions(cardId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buy_options', cardId] });
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['player'] });
       toast.success('Buy option added');
     },
     onError: (error) => {
