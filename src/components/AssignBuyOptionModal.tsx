@@ -21,6 +21,7 @@ import {
 import { usePlayers } from '@/hooks/usePlayers';
 import { useCards } from '@/hooks/useCards';
 import { useBuyOptions } from '@/hooks/useBuyOptions';
+import { useQueryClient } from '@tanstack/react-query';
 import { Seller, SPORTS, SportType, CARD_STATUSES, CardStatus } from '@/types/database';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,6 +37,7 @@ type Step = 'select-player' | 'select-card' | 'buy-option-details';
 export function AssignBuyOptionModal({ open, onOpenChange, seller }: AssignBuyOptionModalProps) {
   const { players } = usePlayers();
   const { createCard } = useCards();
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useState<Step>('select-player');
   const [playerSearch, setPlayerSearch] = useState('');
@@ -170,6 +172,8 @@ export function AssignBuyOptionModal({ open, onOpenChange, seller }: AssignBuyOp
 
       if (error) throw error;
 
+      queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['player'] });
       toast.success('Buy option assigned to seller');
       handleClose(false);
     } catch {

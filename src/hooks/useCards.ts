@@ -1,7 +1,9 @@
+import React from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { CardType, CardStatus } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 /** If the card has a team, ensure it's in the player's teams array and in the teams table */
 async function autoAssignTeamToPlayer(playerId: string, cardTeam: string | null | undefined) {
@@ -75,13 +77,17 @@ export function useCards() {
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
       queryClient.invalidateQueries({ queryKey: ['player'] });
       queryClient.invalidateQueries({ queryKey: ['teams'] });
       toast({
         title: 'Card Added',
         description: 'The card has been added to your collection.',
+        action: React.createElement(ToastAction, {
+          altText: 'View player',
+          onClick: () => { window.location.href = `/player/${variables.player_id}`; },
+        } as any, 'View Player') as any,
       });
     },
     onError: (error) => {

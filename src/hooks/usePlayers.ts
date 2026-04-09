@@ -1,7 +1,9 @@
+import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PlayerWithCards, SportType, Tag, CardType } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 export function usePlayers() {
   const queryClient = useQueryClient();
@@ -60,9 +62,16 @@ export function usePlayers() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
-      toast({ title: 'Player Added', description: 'The player has been added to your collection.' });
+      toast({
+        title: 'Player Added',
+        description: 'The player has been added to your collection.',
+        action: React.createElement(ToastAction, {
+          altText: 'View player',
+          onClick: () => { window.location.href = `/player/${data.id}`; },
+        } as any, 'View Player') as any,
+      });
     },
     onError: (error) => {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
