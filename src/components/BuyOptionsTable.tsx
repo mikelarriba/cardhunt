@@ -35,6 +35,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 
+import { SerialNumberInput } from './SerialNumberInput';
+
 interface BuyOptionsTableProps {
   cardId: string;
   readOnly?: boolean;
@@ -46,6 +48,9 @@ interface BuyOptionFormData {
   price: string;
   shipping_cost: string;
   notes: string;
+  is_numbered: boolean;
+  serial_num: string;
+  serial_total: string;
 }
 
 const initialFormData: BuyOptionFormData = {
@@ -54,6 +59,9 @@ const initialFormData: BuyOptionFormData = {
   price: '',
   shipping_cost: '',
   notes: '',
+  is_numbered: false,
+  serial_num: '',
+  serial_total: '',
 };
 
 export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTableProps) {
@@ -81,6 +89,9 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
       price: option.price?.toString() || '',
       shipping_cost: option.shipping_cost?.toString() || '',
       notes: option.notes || '',
+      is_numbered: option.is_numbered || false,
+      serial_num: option.serial_num?.toString() || '',
+      serial_total: option.serial_total?.toString() || '',
     });
     setEditingOption(option);
     setShowForm(true);
@@ -93,6 +104,9 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
       price: formData.price ? parseFloat(formData.price) : undefined,
       shipping_cost: formData.shipping_cost ? parseFloat(formData.shipping_cost) : 0,
       notes: formData.notes || undefined,
+      is_numbered: formData.is_numbered,
+      serial_num: formData.is_numbered && formData.serial_num ? parseInt(formData.serial_num) : undefined,
+      serial_total: formData.is_numbered && formData.serial_total ? parseInt(formData.serial_total) : undefined,
     };
 
     if (editingOption) {
