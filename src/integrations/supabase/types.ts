@@ -19,9 +19,12 @@ export type Database = {
           card_id: string
           created_at: string
           id: string
+          is_numbered: boolean
           notes: string | null
           price: number | null
           seller_id: string | null
+          serial_num: number | null
+          serial_total: number | null
           shipping_cost: number | null
           source_url: string | null
           updated_at: string
@@ -30,9 +33,12 @@ export type Database = {
           card_id: string
           created_at?: string
           id?: string
+          is_numbered?: boolean
           notes?: string | null
           price?: number | null
           seller_id?: string | null
+          serial_num?: number | null
+          serial_total?: number | null
           shipping_cost?: number | null
           source_url?: string | null
           updated_at?: string
@@ -41,9 +47,12 @@ export type Database = {
           card_id?: string
           created_at?: string
           id?: string
+          is_numbered?: boolean
           notes?: string | null
           price?: number | null
           seller_id?: string | null
+          serial_num?: number | null
+          serial_total?: number | null
           shipping_cost?: number | null
           source_url?: string | null
           updated_at?: string

@@ -3,7 +3,7 @@ import { Pencil, X, ImageIcon, RotateCcw, DollarSign, Calendar, Building2, Tag, 
 import { Card, SportType, LEAGUE_LOGOS } from '@/types/database';
 import { StatusBadge } from './StatusBadge';
 import { BrandBadge } from './BrandBadge';
-import { SerialNumberBadge } from './SerialNumberInput';
+
 import { LeagueLogo } from './LeagueLogo';
 import { BuyOptionsTable } from './BuyOptionsTable';
 import { EditCardModal } from './EditCardModal';
@@ -91,14 +91,6 @@ export function CardDetailModal({ open, onOpenChange, card, sport }: CardDetailM
                   </div>
                 )}
                 
-                {/* Serial Number */}
-                {card.is_numbered && card.serial_num && card.serial_total && (
-                  <SerialNumberBadge
-                    serialNum={card.serial_num}
-                    serialTotal={card.serial_total}
-                    className="absolute bottom-2 left-2 z-10"
-                  />
-                )}
 
                 <div className="aspect-[2/3] w-full overflow-hidden rounded-xl bg-muted relative group shadow-lg">
                   {currentImage ? (

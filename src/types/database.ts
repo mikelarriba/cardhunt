@@ -94,6 +94,9 @@ export interface BuyOption {
   price: number | null;
   shipping_cost: number | null;
   notes: string | null;
+  is_numbered: boolean;
+  serial_num: number | null;
+  serial_total: number | null;
   created_at: string;
   updated_at: string;
   seller?: Seller | null;

@@ -16,7 +16,7 @@ import { useCards } from '@/hooks/useCards';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { DualImageUpload } from './DualImageUpload';
-import { SerialNumberInput } from './SerialNumberInput';
+
 import { SeriesInput } from './SeriesInput';
 import { CardLabelsInput } from './CardLabelsInput';
 
@@ -36,9 +36,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
   
   // New fields
   const [series, setSeries] = useState(card.series || '');
-  const [isNumbered, setIsNumbered] = useState(card.is_numbered || false);
-  const [serialNum, setSerialNum] = useState(card.serial_num?.toString() || '');
-  const [serialTotal, setSerialTotal] = useState(card.serial_total?.toString() || '');
   const [imageFront, setImageFront] = useState<string | null>(card.image_front || card.image_url);
   const [imageBack, setImageBack] = useState<string | null>(card.image_back || null);
   
@@ -68,9 +65,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
       setBrand(card.brand || '');
       setCustomBrand('');
       setSeries(card.series || '');
-      setIsNumbered(card.is_numbered || false);
-      setSerialNum(card.serial_num?.toString() || '');
-      setSerialTotal(card.serial_total?.toString() || '');
       setImageFront(card.image_front || card.image_url);
       setImageBack(card.image_back || null);
       setCardYear(card.card_year?.toString() || '');
@@ -122,9 +116,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
           notes: notes || null,
           brand: finalBrand || null,
           series: series || null,
-          is_numbered: isNumbered,
-          serial_num: isNumbered && serialNum ? parseInt(serialNum) : null,
-          serial_total: isNumbered && serialTotal ? parseInt(serialTotal) : null,
           image_front: imageFront,
           image_back: imageBack,
           card_year: cardYear ? parseInt(cardYear) : null,
@@ -222,15 +213,6 @@ export function EditCardModal({ open, onOpenChange, card }: EditCardModalProps) 
             )}
           </div>
 
-          {/* Serial Numbering */}
-          <SerialNumberInput
-            isNumbered={isNumbered}
-            serialNum={serialNum}
-            serialTotal={serialTotal}
-            onIsNumberedChange={setIsNumbered}
-            onSerialNumChange={setSerialNum}
-            onSerialTotalChange={setSerialTotal}
-          />
 
           {/* Year, Team, Seller - Row */}
           <div className="grid grid-cols-3 gap-3">

@@ -159,7 +159,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { CardStatus, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { useCards } from '@/hooks/useCards';
 import { DualImageUpload } from './DualImageUpload';
-import { SerialNumberInput } from './SerialNumberInput';
+
 import { SeriesInput } from './SeriesInput';
 import { CardLabelsInput } from './CardLabelsInput';
 import { TeamAutocomplete } from './TeamAutocomplete';
@@ -181,9 +181,6 @@ function AddCardModalWithSeller({
   const [brand, setBrand] = useState('');
   const [customBrand, setCustomBrand] = useState('');
   const [series, setSeries] = useState('');
-  const [isNumbered, setIsNumbered] = useState(false);
-  const [serialNum, setSerialNum] = useState('');
-  const [serialTotal, setSerialTotal] = useState('');
   const [imageFront, setImageFront] = useState<string | null>(null);
   const [imageBack, setImageBack] = useState<string | null>(null);
   const [cardYear, setCardYear] = useState('');
@@ -223,9 +220,6 @@ function AddCardModalWithSeller({
         notes: notes || null,
         brand: finalBrand || null,
         series: series || null,
-        is_numbered: isNumbered,
-        serial_num: isNumbered && serialNum ? parseInt(serialNum) : null,
-        serial_total: isNumbered && serialTotal ? parseInt(serialTotal) : null,
         card_labels: cardLabels,
         image_front: imageFront,
         image_back: imageBack,
@@ -317,14 +311,6 @@ function AddCardModalWithSeller({
             )}
           </div>
 
-          <SerialNumberInput
-            isNumbered={isNumbered}
-            serialNum={serialNum}
-            serialTotal={serialTotal}
-            onIsNumberedChange={setIsNumbered}
-            onSerialNumChange={setSerialNum}
-            onSerialTotalChange={setSerialTotal}
-          />
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
