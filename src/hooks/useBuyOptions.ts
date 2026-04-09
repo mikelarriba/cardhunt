@@ -31,6 +31,9 @@ export function useBuyOptions(cardId: string) {
       price?: number;
       shipping_cost?: number;
       notes?: string;
+      is_numbered?: boolean;
+      serial_num?: number;
+      serial_total?: number;
     }) => {
       const { data: buyOption, error } = await supabase
         .from('buy_options')
@@ -41,6 +44,9 @@ export function useBuyOptions(cardId: string) {
           price: data.price ?? null,
           shipping_cost: data.shipping_cost ?? 0,
           notes: data.notes?.trim() || null,
+          is_numbered: data.is_numbered ?? false,
+          serial_num: data.is_numbered ? (data.serial_num ?? null) : null,
+          serial_total: data.is_numbered ? (data.serial_total ?? null) : null,
         })
         .select(`
           *,
@@ -69,6 +75,9 @@ export function useBuyOptions(cardId: string) {
       price?: number;
       shipping_cost?: number;
       notes?: string;
+      is_numbered?: boolean;
+      serial_num?: number;
+      serial_total?: number;
     }) => {
       const { data: buyOption, error } = await supabase
         .from('buy_options')
@@ -78,6 +87,9 @@ export function useBuyOptions(cardId: string) {
           price: data.price ?? null,
           shipping_cost: data.shipping_cost ?? 0,
           notes: data.notes?.trim() || null,
+          is_numbered: data.is_numbered ?? false,
+          serial_num: data.is_numbered ? (data.serial_num ?? null) : null,
+          serial_total: data.is_numbered ? (data.serial_total ?? null) : null,
         })
         .eq('id', id)
         .select(`
