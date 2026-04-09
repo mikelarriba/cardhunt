@@ -193,6 +193,11 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
                       {option.notes && (
                         <p className="text-xs text-muted-foreground mt-1">{option.notes}</p>
                       )}
+                      {option.is_numbered && option.serial_num && option.serial_total && (
+                        <p className="text-xs font-mono text-muted-foreground mt-1">
+                          #{option.serial_num}/{option.serial_total}
+                        </p>
+                      )}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {formatCurrency(option.price)}
