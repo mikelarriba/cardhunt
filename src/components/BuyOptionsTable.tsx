@@ -344,6 +344,14 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
                 rows={2}
               />
             </div>
+            <SerialNumberInput
+              isNumbered={formData.is_numbered}
+              serialNum={formData.serial_num}
+              serialTotal={formData.serial_total}
+              onIsNumberedChange={(v) => setFormData({ ...formData, is_numbered: v })}
+              onSerialNumChange={(v) => setFormData({ ...formData, serial_num: v })}
+              onSerialTotalChange={(v) => setFormData({ ...formData, serial_total: v })}
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowForm(false)}>
