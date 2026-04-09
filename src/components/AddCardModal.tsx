@@ -15,7 +15,7 @@ import { CardStatus, Card, CARD_STATUSES, CARD_BRANDS } from '@/types/database';
 import { useCards } from '@/hooks/useCards';
 import { cn } from '@/lib/utils';
 import { DualImageUpload } from './DualImageUpload';
-import { SerialNumberInput } from './SerialNumberInput';
+
 import { SeriesInput } from './SeriesInput';
 import { CardLabelsInput } from './CardLabelsInput';
 
@@ -43,9 +43,6 @@ export function AddCardModal({
   
   // New fields
   const [series, setSeries] = useState('');
-  const [isNumbered, setIsNumbered] = useState(false);
-  const [serialNum, setSerialNum] = useState('');
-  const [serialTotal, setSerialTotal] = useState('');
   const [imageFront, setImageFront] = useState<string | null>(null);
   const [imageBack, setImageBack] = useState<string | null>(null);
   
@@ -93,9 +90,6 @@ export function AddCardModal({
         brand: finalBrand || null,
         // New fields
         series: series || null,
-        is_numbered: isNumbered,
-        serial_num: isNumbered && serialNum ? parseInt(serialNum) : null,
-        serial_total: isNumbered && serialTotal ? parseInt(serialTotal) : null,
         card_labels: cardLabels,
         image_front: imageFront,
         image_back: imageBack,
@@ -120,9 +114,6 @@ export function AddCardModal({
     setBrand('');
     setCustomBrand('');
     setSeries('');
-    setIsNumbered(false);
-    setSerialNum('');
-    setSerialTotal('');
     setImageFront(null);
     setImageBack(null);
     setCardYear('');
@@ -207,15 +198,6 @@ export function AddCardModal({
             )}
           </div>
 
-          {/* Serial Numbering */}
-          <SerialNumberInput
-            isNumbered={isNumbered}
-            serialNum={serialNum}
-            serialTotal={serialTotal}
-            onIsNumberedChange={setIsNumbered}
-            onSerialNumChange={setSerialNum}
-            onSerialTotalChange={setSerialTotal}
-          />
 
           {/* Year, Team, Seller - Row */}
           <div className="grid grid-cols-3 gap-3">
