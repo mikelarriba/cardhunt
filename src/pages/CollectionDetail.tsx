@@ -258,7 +258,6 @@ export default function CollectionDetail() {
   const { user, loading: authLoading } = useAuth();
   const { players, isLoading: playersLoading } = usePlayers();
   const { tags, cardTagLinks, deleteTag, addCardTag, removeCardTag, isLoading: tagsLoading } = useTags();
-  const [showEditBuilder, setShowEditBuilder] = useState(false);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
 
   const isLoading = authLoading || playersLoading || tagsLoading;
