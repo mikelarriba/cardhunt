@@ -426,6 +426,8 @@ export default function CollectionDetail() {
       </header>
 
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Inline Filter Display for Smart Collections */}
+        {isSmart && <InlineFilterDisplay tag={tag} />}
         {/* Stats Overview */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-around">
