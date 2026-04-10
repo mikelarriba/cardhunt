@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { SportBadge } from '@/components/SportBadge';
 import { CollectionFilterBuilder } from '@/components/CollectionFilterBuilder';
+import { InlineFilterDisplay } from '@/components/InlineFilterDisplay';
 import { usePlayers } from '@/hooks/usePlayers';
 import { useTags, cardMatchesRules } from '@/hooks/useTags';
 import { useAuth } from '@/hooks/useAuth';
