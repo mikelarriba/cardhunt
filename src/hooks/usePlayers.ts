@@ -5,14 +5,39 @@ import { PlayerWithCards, SportType, Tag, CardType } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 
+/** Lightweight player data without cards – loads instantly */
+export interface PlayerSummary {
+  id: string;
+  user_id: string;
+  name: string;
+  sport: SportType;
+  teams: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 export function usePlayers() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const playersQuery = useQuery({
+  // Phase 1: Fast query – players only (no joins)
+  const playersLightQuery = useQuery({
+    queryKey: ['players-light'],
+    queryFn: async (): Promise<PlayerSummary[]> => {
+      const { data, error } = await supabase
+        .from('players')
+        .select('id, user_id, name, sport, teams, created_at, updated_at')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map((p: any) => ({ ...p, teams: p.teams || [] }));
+    },
+    staleTime: 1000 * 60 * 2,
+  });
+
+  // Phase 2: Full query with cards (deferred, loads in background)
+  const playersFullQuery = useQuery({
     queryKey: ['players'],
     queryFn: async (): Promise<PlayerWithCards[]> => {
-      // Single query with joined cards via foreign key
       const { data: players, error: playersError } = await supabase
         .from('players')
         .select(`
@@ -41,6 +66,7 @@ export function usePlayers() {
         player_tags: undefined,
       }));
     },
+    staleTime: 1000 * 60 * 2,
   });
 
   const createPlayer = useMutation({
@@ -64,6 +90,7 @@ export function usePlayers() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['players-light'] });
       toast({
         title: 'Player Added',
         description: 'The player has been added to your collection.',
@@ -98,6 +125,7 @@ export function usePlayers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['players-light'] });
       queryClient.invalidateQueries({ queryKey: ['player'] });
       toast({ title: 'Player Updated', description: 'The player has been updated.' });
     },
@@ -113,6 +141,7 @@ export function usePlayers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['players'] });
+      queryClient.invalidateQueries({ queryKey: ['players-light'] });
       toast({ title: 'Player Deleted', description: 'The player has been removed from your collection.' });
     },
     onError: (error) => {
@@ -120,10 +149,27 @@ export function usePlayers() {
     },
   });
 
+  // Merge: use full data if available, otherwise light data with empty cards
+  const players: PlayerWithCards[] = React.useMemo(() => {
+    if (playersFullQuery.data) return playersFullQuery.data;
+    if (playersLightQuery.data) {
+      return playersLightQuery.data.map(p => ({
+        ...p,
+        cards: [],
+        tags: [],
+        image_url: null,
+      }));
+    }
+    return [];
+  }, [playersLightQuery.data, playersFullQuery.data]);
+
   return {
-    players: playersQuery.data || [],
-    isLoading: playersQuery.isLoading,
-    error: playersQuery.error,
+    players,
+    playersLight: playersLightQuery.data || [],
+    isLoading: playersLightQuery.isLoading,
+    isLoadingFull: playersFullQuery.isLoading,
+    hasFullData: !!playersFullQuery.data,
+    error: playersFullQuery.error || playersLightQuery.error,
     createPlayer,
     updatePlayer,
     deletePlayer,

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2, FolderOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, LogOut, Sparkles, LayoutGrid, SearchX, Store, Wand2, FolderOpen, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PlayerCard } from './PlayerCard';
 import { VirtualPlayerGrid } from './VirtualPlayerGrid';
@@ -19,6 +19,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useViewMode } from '@/hooks/useViewMode';
 import { SportType, CardStatus } from '@/types/database';
 
+const PAGE_SIZE = 10;
+
 export function Dashboard() {
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [showSmartBuilder, setShowSmartBuilder] = useState(false);
@@ -29,35 +31,24 @@ export function Dashboard() {
   const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
   const [selectedTeam, setSelectedTeam] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useViewMode();
-  const { players, isLoading } = usePlayers();
+  const [currentPage, setCurrentPage] = useState(1);
+  const { players, isLoading, isLoadingFull, hasFullData } = usePlayers();
   const { tags, cardTagLinks } = useTags();
   const { signOut, user } = useAuth();
 
   const handleSignOut = async () => {
     const { error } = await signOut();
-    if (error) {
-      console.warn('Logout warning:', error.message);
-    }
+    if (error) console.warn('Logout warning:', error.message);
   };
 
-  // Get all unique teams from players
   const availableTeams = useMemo(() => {
     const teamsSet = new Set<string>();
-    players.forEach((player) => {
-      player.teams?.forEach((team) => teamsSet.add(team));
-    });
+    players.forEach(p => p.teams?.forEach(t => teamsSet.add(t)));
     return Array.from(teamsSet).sort();
   }, [players]);
 
-  // Check if any filters are active
   const hasActiveFilters = useMemo(() => {
-    return (
-      searchQuery !== '' ||
-      selectedSport !== 'all' ||
-      selectedStatus !== 'all' ||
-      selectedTag !== 'all' ||
-      selectedTeam !== 'all'
-    );
+    return searchQuery !== '' || selectedSport !== 'all' || selectedStatus !== 'all' || selectedTag !== 'all' || selectedTeam !== 'all';
   }, [searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam]);
 
   const clearFilters = () => {
@@ -66,85 +57,68 @@ export function Dashboard() {
     setSelectedStatus('all');
     setSelectedTag('all');
     setSelectedTeam('all');
+    setCurrentPage(1);
   };
 
   const filteredPlayers = useMemo(() => {
-    // Find the selected tag to check if it's smart or manual
     const selectedTagObj = selectedTag !== 'all' ? tags.find(t => t.id === selectedTag) : null;
 
-    return players.filter((player) => {
-      // Text search filter
+    return players.filter(player => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = player.name.toLowerCase().includes(query);
-        const matchesTeam = player.teams?.some((team) =>
-          team.toLowerCase().includes(query)
-        );
+        const matchesTeam = player.teams?.some(team => team.toLowerCase().includes(query));
         if (!matchesName && !matchesTeam) return false;
       }
 
-      // Filter by tag/collection (card-based)
       if (selectedTag !== 'all' && selectedTagObj) {
         if (selectedTagObj.filter_rules) {
-          // Smart collection: check if any card matches the rules
           const hasMatchingCard = player.cards.some(card =>
             cardMatchesRules(card, selectedTagObj.filter_rules!, player.sport)
           );
           if (!hasMatchingCard) return false;
         } else {
-          // Manual collection: check card_tags
           const playerCardIds = new Set(player.cards.map(c => c.id));
-          const hasTaggedCard = cardTagLinks.some(
-            ct => ct.tag_id === selectedTag && playerCardIds.has(ct.card_id)
-          );
+          const hasTaggedCard = cardTagLinks.some(ct => ct.tag_id === selectedTag && playerCardIds.has(ct.card_id));
           if (!hasTaggedCard) return false;
         }
       }
 
-      // Filter by team
-      if (selectedTeam !== 'all') {
-        const hasTeam = player.teams?.includes(selectedTeam);
-        if (!hasTeam) return false;
-      }
-
-      // Filter by sport
-      if (selectedSport !== 'all' && player.sport !== selectedSport) {
-        return false;
-      }
-
-      // Filter by status
-      if (selectedStatus !== 'all') {
-        const hasMatchingCard = player.cards.some(
-          (card) => card.status === selectedStatus
-        );
-        if (!hasMatchingCard) return false;
-      }
+      if (selectedTeam !== 'all' && !player.teams?.includes(selectedTeam)) return false;
+      if (selectedSport !== 'all' && player.sport !== selectedSport) return false;
+      if (selectedStatus !== 'all' && !player.cards.some(card => card.status === selectedStatus)) return false;
 
       return true;
     });
   }, [players, searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam, tags, cardTagLinks]);
 
+  // Reset page when filters change
+  useMemo(() => { setCurrentPage(1); }, [searchQuery, selectedSport, selectedStatus, selectedTag, selectedTeam]);
+
+  const totalPages = Math.ceil(filteredPlayers.length / PAGE_SIZE);
+  const paginatedPlayers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredPlayers.slice(start, start + PAGE_SIZE);
+  }, [filteredPlayers, currentPage]);
+
   const stats = useMemo(() => {
-    const allCards = players.flatMap((p) => p.cards);
+    const allCards = players.flatMap(p => p.cards);
     return {
       totalPlayers: players.length,
-      ownedCards: allCards.filter((c) => c.status === 'owned').length,
-      locatedCards: allCards.filter((c) => c.status === 'located').length,
-      missingCards: allCards.filter((c) => c.status === 'missing').length,
-      totalValue: allCards
-        .filter((c) => c.status === 'owned' && c.price)
-        .reduce((sum, c) => sum + (c.price || 0), 0),
+      ownedCards: allCards.filter(c => c.status === 'owned').length,
+      locatedCards: allCards.filter(c => c.status === 'located').length,
+      missingCards: allCards.filter(c => c.status === 'missing').length,
+      totalValue: allCards.filter(c => c.status === 'owned' && c.price).reduce((sum, c) => sum + (c.price || 0), 0),
     };
   }, [players]);
 
   const selectedTagObj = useMemo(() => {
     if (selectedTag === 'all') return null;
-    return tags.find((t) => t.id === selectedTag) || null;
+    return tags.find(t => t.id === selectedTag) || null;
   }, [selectedTag, tags]);
 
   const selectedTagName = selectedTagObj?.name || null;
 
-  // Collect all cards matching the selected collection for the summary
   const collectionCards = useMemo(() => {
     if (!selectedTagObj) return [];
     return filteredPlayers.flatMap(p => {
@@ -166,34 +140,23 @@ export function Dashboard() {
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="font-display font-bold text-xl text-gradient-gold">
-                  Card Hunt
-                </h1>
+                <h1 className="font-display font-bold text-xl text-gradient-gold">Card Hunt</h1>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <Button variant="ghost" size="icon" asChild title="Collections">
-                <Link to="/collections">
-                  <FolderOpen className="w-5 h-5" />
-                </Link>
+                <Link to="/collections"><FolderOpen className="w-5 h-5" /></Link>
               </Button>
               <Button variant="ghost" size="icon" asChild title="Sellers">
-                <Link to="/sellers">
-                  <Store className="w-5 h-5" />
-                </Link>
+                <Link to="/sellers"><Store className="w-5 h-5" /></Link>
               </Button>
               <Button variant="ghost" size="icon" onClick={() => setShowSmartBuilder(true)} title="Smart Collection">
                 <Wand2 className="w-5 h-5" />
               </Button>
               <AddPlayerDropdown onAddSingle={() => setShowAddPlayer(true)} />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleSignOut}
-                className="text-muted-foreground hover:text-foreground"
-              >
+              <Button variant="ghost" size="icon" onClick={handleSignOut} className="text-muted-foreground hover:text-foreground">
                 <LogOut className="w-5 h-5" />
               </Button>
             </div>
@@ -210,9 +173,7 @@ export function Dashboard() {
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-2"
           >
             {showStats ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            <span className="font-medium">
-              {showStats ? 'Hide' : 'Show'} Stats & Filters
-            </span>
+            <span className="font-medium">{showStats ? 'Hide' : 'Show'} Stats & Filters</span>
             {!showStats && (
               <span className="text-xs opacity-70">
                 — {stats.totalPlayers} players · {stats.ownedCards} owned · ${stats.totalValue.toFixed(0)}
@@ -222,7 +183,6 @@ export function Dashboard() {
 
           {showStats && (
             <div className="space-y-3 animate-fade-in">
-              {/* Compact Stats Bar */}
               <div className="grid grid-cols-5 gap-2">
                 <div className="glass-card px-3 py-2 text-center">
                   <p className="text-lg font-display font-bold text-foreground">{stats.totalPlayers}</p>
@@ -246,19 +206,26 @@ export function Dashboard() {
                 </div>
               </div>
 
-              {/* Search & Filter Bar */}
+              {/* Loading indicator for card data */}
+              {!hasFullData && !isLoading && (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                  Loading collection data...
+                </div>
+              )}
+
               <SearchFilterBar
-          searchQuery={searchQuery}
-          selectedSport={selectedSport}
-          selectedStatus={selectedStatus}
-          selectedTag={selectedTag}
-          selectedTeam={selectedTeam}
-          availableTeams={availableTeams}
-          onSearchChange={setSearchQuery}
-          onSportChange={setSelectedSport}
-          onStatusChange={setSelectedStatus}
-          onTagChange={setSelectedTag}
-          onTeamChange={setSelectedTeam}
+                searchQuery={searchQuery}
+                selectedSport={selectedSport}
+                selectedStatus={selectedStatus}
+                selectedTag={selectedTag}
+                selectedTeam={selectedTeam}
+                availableTeams={availableTeams}
+                onSearchChange={setSearchQuery}
+                onSportChange={setSelectedSport}
+                onStatusChange={setSelectedStatus}
+                onTagChange={setSelectedTag}
+                onTeamChange={setSelectedTeam}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
               />
@@ -266,15 +233,16 @@ export function Dashboard() {
           )}
         </div>
 
-        {/* MIDDLE: View Switcher */}
+        {/* View Switcher + count */}
         <div className="flex items-center justify-between mb-6">
           <p className="text-sm text-muted-foreground">
-            {filteredPlayers.length} player{filteredPlayers.length !== 1 ? 's' : ''} found
+            {filteredPlayers.length} player{filteredPlayers.length !== 1 ? 's' : ''}
+            {totalPages > 1 && ` · Page ${currentPage} of ${totalPages}`}
           </p>
           <ViewSwitcher value={viewMode} onChange={setViewMode} />
         </div>
 
-        {/* Collection Summary when viewing a specific collection */}
+        {/* Collection Summary */}
         {selectedTagName && filteredPlayers.length > 0 && (
           <CollectionSummary
             collectionName={selectedTagName}
@@ -283,7 +251,7 @@ export function Dashboard() {
           />
         )}
 
-        {/* BOTTOM: Players Grid/Table */}
+        {/* Players Grid/Table */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
@@ -301,37 +269,74 @@ export function Dashboard() {
               )}
             </div>
             <h2 className="font-display font-semibold text-xl mb-2">
-              {players.length === 0
-                ? 'Start Your Collection'
-                : 'No players found'}
+              {players.length === 0 ? 'Start Your Collection' : 'No players found'}
             </h2>
             <p className="text-muted-foreground text-center max-w-sm mb-6">
               {players.length === 0
                 ? 'Add your first player to begin tracking your sports card collection.'
-                : 'Try adjusting your search or filters to find what you\'re looking for.'}
+                : "Try adjusting your search or filters to find what you're looking for."}
             </p>
             {players.length === 0 ? (
-              <Button
-                onClick={() => setShowAddPlayer(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Your First Player
+              <Button onClick={() => setShowAddPlayer(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Plus className="w-4 h-4 mr-2" /> Add Your First Player
               </Button>
             ) : (
-              <Button
-                onClick={clearFilters}
-                variant="outline"
-                className="gap-2"
-              >
-                Clear all filters
-              </Button>
+              <Button onClick={clearFilters} variant="outline" className="gap-2">Clear all filters</Button>
             )}
           </div>
         ) : viewMode === 'table' ? (
-          <PlayersTable players={filteredPlayers} />
+          <PlayersTable players={paginatedPlayers} loadingCards={!hasFullData} />
         ) : (
-          <VirtualPlayerGrid players={filteredPlayers} viewMode={viewMode === 'compact' ? 'compact' : 'grid'} />
+          <VirtualPlayerGrid players={paginatedPlayers} viewMode={viewMode === 'compact' ? 'compact' : 'grid'} />
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && filteredPlayers.length > 0 && (
+          <div className="flex items-center justify-center gap-2 mt-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="gap-1"
+            >
+              <ChevronLeft className="w-4 h-4" /> Previous
+            </Button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                let page: number;
+                if (totalPages <= 7) {
+                  page = i + 1;
+                } else if (currentPage <= 4) {
+                  page = i + 1;
+                } else if (currentPage >= totalPages - 3) {
+                  page = totalPages - 6 + i;
+                } else {
+                  page = currentPage - 3 + i;
+                }
+                return (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? 'default' : 'ghost'}
+                    size="sm"
+                    className="w-8 h-8 p-0"
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                );
+              })}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="gap-1"
+            >
+              Next <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
         )}
       </main>
 

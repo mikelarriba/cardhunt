@@ -11,7 +11,7 @@ export function useViewMode() {
         return stored;
       }
     }
-    return 'standard';
+    return 'table';
   });
 
   useEffect(() => {
