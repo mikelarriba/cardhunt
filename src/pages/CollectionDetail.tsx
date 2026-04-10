@@ -381,11 +381,6 @@ export default function CollectionDetail() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              {isSmart && (
-                <Button variant="outline" size="sm" onClick={() => setShowEditBuilder(true)}>
-                  <Pencil className="w-4 h-4 mr-2" /> Edit Query
-                </Button>
-              )}
               {!isSmart && (
                 <Button variant="outline" size="sm" onClick={() => setShowAddPlayer(true)}>
                   <Plus className="w-4 h-4 mr-2" /> Add Player
