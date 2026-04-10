@@ -513,12 +513,6 @@ export default function CollectionDetail() {
           </div>
         )}
       </main>
-
-      <CollectionFilterBuilder
-        open={showEditBuilder}
-        onOpenChange={setShowEditBuilder}
-        editTag={tag}
-      />
     </div>
   );
 }
