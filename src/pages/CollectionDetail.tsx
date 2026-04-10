@@ -2,13 +2,14 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
-  ArrowLeft, Sparkles, FolderOpen, Pencil, Trash2, Plus, UserMinus,
+  ArrowLeft, Sparkles, FolderOpen, Trash2, Plus, UserMinus,
   ChevronDown, ChevronRight, ExternalLink, Hash,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { SportBadge } from '@/components/SportBadge';
 import { CollectionFilterBuilder } from '@/components/CollectionFilterBuilder';
+import { InlineFilterDisplay } from '@/components/InlineFilterDisplay';
 import { usePlayers } from '@/hooks/usePlayers';
 import { useTags, cardMatchesRules } from '@/hooks/useTags';
 import { useAuth } from '@/hooks/useAuth';
@@ -257,7 +258,6 @@ export default function CollectionDetail() {
   const { user, loading: authLoading } = useAuth();
   const { players, isLoading: playersLoading } = usePlayers();
   const { tags, cardTagLinks, deleteTag, addCardTag, removeCardTag, isLoading: tagsLoading } = useTags();
-  const [showEditBuilder, setShowEditBuilder] = useState(false);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
 
   const isLoading = authLoading || playersLoading || tagsLoading;
@@ -381,11 +381,6 @@ export default function CollectionDetail() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              {isSmart && (
-                <Button variant="outline" size="sm" onClick={() => setShowEditBuilder(true)}>
-                  <Pencil className="w-4 h-4 mr-2" /> Edit Query
-                </Button>
-              )}
               {!isSmart && (
                 <Button variant="outline" size="sm" onClick={() => setShowAddPlayer(true)}>
                   <Plus className="w-4 h-4 mr-2" /> Add Player
@@ -431,6 +426,8 @@ export default function CollectionDetail() {
       </header>
 
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Inline Filter Display for Smart Collections */}
+        {isSmart && <InlineFilterDisplay tag={tag} />}
         {/* Stats Overview */}
         <div className="glass-card p-6">
           <div className="flex items-center justify-around">
@@ -518,12 +515,6 @@ export default function CollectionDetail() {
           </div>
         )}
       </main>
-
-      <CollectionFilterBuilder
-        open={showEditBuilder}
-        onOpenChange={setShowEditBuilder}
-        editTag={tag}
-      />
     </div>
   );
 }
