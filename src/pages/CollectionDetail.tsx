@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
-  ArrowLeft, Sparkles, FolderOpen, Pencil, Trash2, Plus, UserMinus,
+  ArrowLeft, Sparkles, FolderOpen, Trash2, Plus, UserMinus,
   ChevronDown, ChevronRight, ExternalLink, Hash,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
