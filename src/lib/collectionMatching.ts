@@ -12,7 +12,7 @@ function matchesPlayerCondition(player: PlayerWithCards, condition: FilterCondit
       if (condition.operator === 'equals') return teams.some((team) => team === value);
       if (condition.operator === 'contains') return teams.some((team) => team.includes(value));
       if (condition.operator === 'in') {
-        return Array.isArray(condition.value) && condition.value.some((entry) => teams.some((team) => team === entry.toLowerCase()));
+        return Array.isArray(condition.value) && condition.value.some((entry) => teams.some((team) => team === String(entry).toLowerCase()));
       }
       return false;
     }

@@ -12,6 +12,7 @@ import { useTags, cardMatchesRules } from '@/hooks/useTags';
 import { useAuth } from '@/hooks/useAuth';
 import { Tag, Card, PlayerWithCards } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { getSmartCollectionCards } from '@/lib/collectionMatching';
 
 const CARD_SLOTS = ['Rookie', 'Autographed', 'Base'] as const;
 
@@ -32,7 +33,7 @@ function CollectionCard({ tag, players, cardTagLinks }: { tag: Tag; players: Pla
     for (const player of players) {
       let matchingCards: Card[];
       if (tag.filter_rules) {
-        matchingCards = player.cards.filter(c => cardMatchesRules(c, tag.filter_rules!, player.sport, player.teams));
+        matchingCards = getSmartCollectionCards(player, tag.filter_rules!);
       } else {
         const taggedCardIds = new Set(
           cardTagLinks.filter(ct => ct.tag_id === tag.id).map(ct => ct.card_id)
