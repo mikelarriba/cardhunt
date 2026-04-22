@@ -38,6 +38,7 @@ export function getRequestedCollectionSlots(rules: FilterRules): string[] {
 
     if (condition.operator === 'in' && Array.isArray(condition.value)) {
       for (const value of condition.value) {
+        if (typeof value !== 'string') continue;
         const matchingSlot = TRACKED_SLOT_LABELS.find((slot) => slot.toLowerCase() === value.toLowerCase());
         if (matchingSlot) slots.add(matchingSlot);
       }
