@@ -32,7 +32,8 @@ export function getRequestedCollectionSlots(rules: FilterRules): string[] {
     if (condition.field !== 'card_labels') continue;
 
     if (condition.operator === 'contains' && typeof condition.value === 'string') {
-      const matchingSlot = TRACKED_SLOT_LABELS.find((slot) => slot.toLowerCase() === condition.value.toLowerCase());
+      const value = condition.value;
+      const matchingSlot = TRACKED_SLOT_LABELS.find((slot) => slot.toLowerCase() === value.toLowerCase());
       if (matchingSlot) slots.add(matchingSlot);
     }
 
