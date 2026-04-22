@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSellers } from '@/hooks/useSellers';
 import { usePlayers } from '@/hooks/usePlayers';
 import { useBuyOptions } from '@/hooks/useBuyOptions';
+import { useSellerStats } from '@/hooks/useSellerStats';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
@@ -61,6 +62,7 @@ export default function SellerDetail() {
   const { user, loading: authLoading } = useAuth();
   const { sellers, isLoading: sellersLoading, updateSeller, deleteSeller } = useSellers();
   const { players, isLoading: playersLoading } = usePlayers();
+  const { data: sellerStats = [], isLoading: sellerStatsLoading } = useSellerStats();
 
   const [showEdit, setShowEdit] = useState(false);
   const [showAddCard, setShowAddCard] = useState(false);
@@ -71,9 +73,11 @@ export default function SellerDetail() {
 
   const seller = useMemo(() => sellers.find(s => s.id === id) || null, [sellers, id]);
 
-  // Build a map of all cards by id, and buy options for this seller
+  const sellerStatsEntry = useMemo(() => sellerStats.find((entry) => entry.id === id) || null, [sellerStats, id]);
+
+  // Build a list of seller-related cards for display
   const { buyOptionsForSeller, stats } = useMemo(() => {
-    if (!seller || !players) return { buyOptionsForSeller: [] as BuyOptionWithCard[], stats: { totalCards: 0, totalValue: 0, totalShipping: 0, avgPrice: 0 } };
+    if (!seller || !players) return { buyOptionsForSeller: [] as BuyOptionWithCard[], stats: { totalCards: 0, totalValue: 0, totalShipping: 0, avgPrice: 0, avgShipping: 0 } };
 
     const allCards = new Map<string, { card: Card; playerName: string; playerId: string }>();
     for (const p of players) {
@@ -119,20 +123,22 @@ export default function SellerDetail() {
       }
     }
 
-    const totalValue = cardsBySeller.reduce((sum, bo) => sum + (bo.price || 0), 0);
-    const totalShipping = cardsBySeller.reduce((sum, bo) => sum + (bo.shipping_cost || 0), 0);
-    const avgPrice = cardsBySeller.length > 0 ? totalValue / cardsBySeller.length : 0;
+    const totalValue = sellerStatsEntry?.total_value ?? cardsBySeller.reduce((sum, bo) => sum + (bo.price || 0) + (bo.shipping_cost || 0), 0);
+    const totalShipping = sellerStatsEntry?.total_shipping ?? cardsBySeller.reduce((sum, bo) => sum + (bo.shipping_cost || 0), 0);
+    const avgPrice = sellerStatsEntry?.avg_price ?? (cardsBySeller.length > 0 ? cardsBySeller.reduce((sum, bo) => sum + (bo.price || 0), 0) / cardsBySeller.length : 0);
+    const avgShipping = sellerStatsEntry?.avg_shipping ?? (cardsBySeller.length > 0 ? totalShipping / cardsBySeller.length : 0);
 
     return {
       buyOptionsForSeller: cardsBySeller.sort((a, b) => (a.playerName || '').localeCompare(b.playerName || '')),
       stats: {
-        totalCards: cardsBySeller.length,
+        totalCards: sellerStatsEntry?.buy_option_count ?? cardsBySeller.length,
         totalValue,
         totalShipping,
         avgPrice,
+        avgShipping,
       },
     };
-  }, [seller, players]);
+  }, [seller, players, sellerStatsEntry]);
 
   const openEdit = () => {
     if (!seller) return;
@@ -171,7 +177,7 @@ export default function SellerDetail() {
     return null;
   }
 
-  const isLoading = authLoading || sellersLoading || playersLoading;
+  const isLoading = authLoading || sellersLoading || playersLoading || sellerStatsLoading;
 
   if (isLoading) {
     return (
@@ -293,9 +299,9 @@ export default function SellerDetail() {
           <div className="glass-card p-4 text-center">
             <Truck className="w-5 h-5 text-status-located mx-auto mb-1" />
             <p className="text-2xl font-display font-bold text-foreground">
-              {seller.shipping_cost != null ? `$${seller.shipping_cost.toFixed(2)}` : '—'}
+              {stats.totalCards > 0 ? `$${stats.avgShipping.toFixed(2)}` : '—'}
             </p>
-            <p className="text-xs text-muted-foreground">Shipping</p>
+            <p className="text-xs text-muted-foreground">Shipping Avg</p>
           </div>
         </div>
 

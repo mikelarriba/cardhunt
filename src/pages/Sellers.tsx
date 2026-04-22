@@ -238,6 +238,8 @@ const Sellers = () => {
                     <TableHead>Seller</TableHead>
                     <TableHead className="text-center">Buy Options</TableHead>
                     <TableHead className="text-right">Total Value</TableHead>
+                     <TableHead className="text-right">Avg Price</TableHead>
+                     <TableHead className="text-right">Shipping Avg</TableHead>
                     <TableHead className="w-40">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -270,6 +272,16 @@ const Sellers = () => {
                           ? `$${seller.total_value.toFixed(2)}`
                           : '-'}
                       </TableCell>
+                       <TableCell className="text-right tabular-nums">
+                         {seller.buy_option_count > 0
+                           ? `$${seller.avg_price.toFixed(2)}`
+                           : '-'}
+                       </TableCell>
+                       <TableCell className="text-right tabular-nums">
+                         {seller.buy_option_count > 0
+                           ? `$${seller.avg_shipping.toFixed(2)}`
+                           : '-'}
+                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Button
