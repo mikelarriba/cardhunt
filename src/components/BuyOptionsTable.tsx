@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ExternalLink, Plus, Pencil, Trash2, Store } from 'lucide-react';
 import { BuyOption } from '@/types/database';
 import { useBuyOptions } from '@/hooks/useBuyOptions';
@@ -160,6 +161,7 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead>Seller</TableHead>
+                <TableHead className="w-16 text-center">Link</TableHead>
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Shipping</TableHead>
                 <TableHead className="text-right">Total</TableHead>
@@ -175,18 +177,12 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
                   <TableRow key={option.id} className="hover:bg-muted/30">
                     <TableCell>
                       {option.seller ? (
-                        option.seller.url ? (
-                          <a
-                            href={option.seller.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline font-medium"
-                          >
-                            {option.seller.name}
-                          </a>
-                        ) : (
-                          <span className="font-medium">{option.seller.name}</span>
-                        )
+                        <Link
+                          to={`/seller/${option.seller_id}`}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          {option.seller.name}
+                        </Link>
                       ) : (
                         <span className="text-muted-foreground">Unknown</span>
                       )}
@@ -197,6 +193,22 @@ export function BuyOptionsTable({ cardId, readOnly = false }: BuyOptionsTablePro
                         <p className="text-xs font-mono text-muted-foreground mt-1">
                           #{option.serial_num}/{option.serial_total}
                         </p>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {option.seller?.url ? (
+                        <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                          <a
+                            href={option.seller.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Open seller on eBay"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      ) : (
+                        <span className="text-muted-foreground text-xs">-</span>
                       )}
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
